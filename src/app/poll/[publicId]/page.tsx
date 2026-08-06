@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { RestaurantMap } from "@/components/google";
 import { SiteHeader } from "@/components/site-header";
 import { AutoRefresh } from "@/components/poll/auto-refresh";
 import { BallotForm } from "@/components/poll/ballot-form";
@@ -8,6 +7,7 @@ import { CandidateGallery } from "@/components/poll/candidate-gallery";
 import { JoinPollForm } from "@/components/poll/join-poll-form";
 import { NominationForm } from "@/components/poll/nomination-form";
 import { PhaseSteps } from "@/components/poll/phase-steps";
+import { PollMapDialog } from "@/components/poll/poll-map-dialog";
 import { ResultsList } from "@/components/poll/results-list";
 import { Notice } from "@/components/ui/notice";
 import { getAuthorizedPoll } from "@/lib/data/access";
@@ -70,6 +70,13 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
               <span className="status-pill">{poll.status}</span>
               <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] sm:text-5xl">{poll.title}</h1>
               <p className="mt-3 text-muted">Driving estimates start from {poll.center.label}.</p>
+              {poll.currentVoter && (poll.status === "nominations" || poll.status === "voting") ? (
+                <PollMapDialog
+                  center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
+                  centerLabel={poll.center.label}
+                  candidates={interactiveCandidates}
+                />
+              ) : null}
             </div>
             <PhaseSteps status={poll.status} />
           </div>
@@ -89,7 +96,7 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
                 action={nominateAction}
               />
             </aside>
-            <div className="min-w-0 space-y-7 xl:col-start-1 xl:row-start-1">
+            <div className="min-w-0 xl:col-start-1 xl:row-start-1">
               <section>
                 <div className="mb-4 flex items-end justify-between gap-4">
                   <div>
@@ -103,37 +110,23 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
                   <Notice title="No nominations yet">Be the first person to add a lunch option.</Notice>
                 )}
               </section>
-              <RestaurantMap
-                center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
-                centerLabel={poll.center.label}
-                candidates={interactiveCandidates}
-              />
             </div>
           </div>
         ) : null}
 
         {poll.currentVoter && poll.status === "voting" ? (
-          <div className="mt-7 grid gap-7 xl:grid-cols-[minmax(0,1fr)_390px]">
-            <aside className="xl:col-start-2 xl:row-start-1">
-              <BallotForm
-                pollId={poll.id}
-                publicId={poll.publicId}
-                candidates={interactiveCandidates}
-                initialCandidateIds={poll.ballot?.candidateIds ?? []}
-                revision={poll.ballot?.revision ?? 0}
-                maxChoices={poll.maxChoices}
-                saveAction={saveAction}
-                withdrawAction={withdrawAction}
-              />
-            </aside>
-            <div className="min-w-0 xl:col-start-1 xl:row-start-1">
-              <RestaurantMap
-                center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
-                centerLabel={poll.center.label}
-                candidates={interactiveCandidates}
-              />
-            </div>
-          </div>
+          <section className="mt-7">
+            <BallotForm
+              pollId={poll.id}
+              publicId={poll.publicId}
+              candidates={interactiveCandidates}
+              initialCandidateIds={poll.ballot?.candidateIds ?? []}
+              revision={poll.ballot?.revision ?? 0}
+              maxChoices={poll.maxChoices}
+              saveAction={saveAction}
+              withdrawAction={withdrawAction}
+            />
+          </section>
         ) : null}
 
         {poll.status === "closed" ? (

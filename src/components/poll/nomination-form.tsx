@@ -13,20 +13,28 @@ type NominationFormProps = {
 };
 
 export function NominationForm({ center, action }: NominationFormProps) {
-  const [state, formAction] = useActionState(action, initialActionState);
   const [selectedPlace, setSelectedPlace] = useState<GooglePlaceDetails | null>(null);
+  const [searchKey, setSearchKey] = useState(0);
+  const [state, formAction] = useActionState(async (previousState: ActionState, formData: FormData) => {
+    const nextState = await action(previousState, formData);
+
+    if (nextState.ok) {
+      setSelectedPlace(null);
+      setSearchKey((currentKey) => currentKey + 1);
+    }
+
+    return nextState;
+  }, initialActionState);
 
   return (
     <form action={formAction} className="panel p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold">Nominate a restaurant</h2>
-          <p className="mt-1 text-sm leading-6 text-muted">Up to five nominations per voter. Existing choices are deduplicated automatically.</p>
-        </div>
-        <span className="status-pill">Google Maps</span>
+      <div>
+        <h2 className="text-lg font-bold">Nominate a restaurant</h2>
+        <p className="mt-1 text-sm leading-6 text-muted">Up to five nominations per voter. Existing choices are deduplicated automatically.</p>
       </div>
       <div className="mt-5">
         <PlaceAutocompleteSearch
+          key={searchKey}
           center={center}
           onPlaceSelect={setSelectedPlace}
           onError={() => setSelectedPlace(null)}

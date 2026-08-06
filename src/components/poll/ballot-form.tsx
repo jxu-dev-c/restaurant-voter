@@ -161,7 +161,7 @@ export function BallotForm({
             <legend className="font-bold">Choose up to {maxChoices}</legend>
             <span className="status-pill" aria-live="polite">{selectedCount} selected</span>
           </div>
-          <div className="grid gap-3">
+          <div className="grid gap-4 lg:grid-cols-2">
             {candidates.map((candidate, index) => {
             const checked = currentDraft.selected.has(candidate.id);
             const disabled = !checked && selectedCount >= maxChoices;
