@@ -66,6 +66,9 @@ describe("NominationForm", () => {
     });
     expect(screen.getByRole("button", { name: "Nominate this restaurant" })).toBeDisabled();
     expect(screen.getByRole("status")).toHaveTextContent("Test Restaurant was nominated.");
+    expect(screen.getByRole("dialog", { name: "Nomination saved" })).toHaveTextContent(
+      "You can return using this same link while nominations are still open.",
+    );
     expect(action).toHaveBeenCalledOnce();
     expect(action.mock.calls[0]?.[1]).toBeInstanceOf(FormData);
     expect((action.mock.calls[0]?.[1] as FormData).get("placeId")).toBe("test-place-id");

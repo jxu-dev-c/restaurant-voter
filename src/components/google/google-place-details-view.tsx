@@ -62,9 +62,11 @@ function PhotoAttributions({ place }: { place: GooglePlaceDetails }) {
 export function GooglePlaceDetailsView({
   place,
   compact = false,
+  elevated = true,
 }: {
   place: GooglePlaceDetails;
   compact?: boolean;
+  elevated?: boolean;
 }) {
   const mapsUri = place.googleMapsUri ?? googleMapsPlaceUrl(place.placeId);
   const rating =
@@ -77,7 +79,9 @@ export function GooglePlaceDetailsView({
         }`;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <article
+      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white ${elevated ? "shadow-sm" : ""}`}
+    >
       {!compact ? (
         <figure className="p-3 pb-0">
           {place.photo?.uri ? (

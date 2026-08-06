@@ -6,6 +6,7 @@ import { initialActionState } from "@/lib/domain/types";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { GooglePlaceDetailsCard } from "@/components/google";
 import { formatDate, formatDistance, formatDuration } from "@/lib/domain/format";
+import { SubmissionSuccessDialog } from "./submission-success-dialog";
 import { useRouteMetrics } from "./use-route-metrics";
 
 type BallotFormProps = {
@@ -68,6 +69,7 @@ export function BallotForm({
   const authoritativeKey = `${revision}:${authoritativeSelection}`;
   const [state, formAction] = useActionState(saveAction, initialActionState);
   const handledActionStateRef = useRef<ActionState>(state);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [draft, setDraft] = useState<BallotDraft>(() => ({
     selected: new Set(initialCandidateIds),
     expectedRevision: revision,
@@ -104,6 +106,7 @@ export function BallotForm({
       }
 
       const candidateIds = JSON.parse(authoritativeSelection) as string[];
+      setSuccessDialogOpen(true);
       setDraft({
         selected: new Set(candidateIds),
         expectedRevision: revision,
@@ -189,7 +192,11 @@ export function BallotForm({
                   </label>
                 </div>
                 <div className="mt-3 min-w-0">
-                  <GooglePlaceDetailsCard placeId={candidate.placeId} fallbackLabel={candidate.fallbackLabel} />
+                  <GooglePlaceDetailsCard
+                    elevated={false}
+                    placeId={candidate.placeId}
+                    fallbackLabel={candidate.fallbackLabel}
+                  />
                   <div className="mt-2 flex flex-wrap gap-2">
                     <span className="status-pill">{formatDistance(metrics.get(candidate.placeId)?.distanceMeters)}</span>
                     <span className="status-pill">{formatDuration(metrics.get(candidate.placeId)?.durationSeconds)} drive</span>
@@ -243,6 +250,12 @@ export function BallotForm({
           </SubmitButton>
         </form>
       ) : null}
+      <SubmissionSuccessDialog
+        description="Your choices are saved. You can return using this same link anytime to change them while voting is still open."
+        open={successDialogOpen}
+        title="Vote saved"
+        onClose={() => setSuccessDialogOpen(false)}
+      />
     </div>
   );
 }

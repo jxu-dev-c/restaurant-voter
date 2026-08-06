@@ -13,12 +13,14 @@ export function GooglePlaceDetailsCard({
   fallbackLabel = "Restaurant",
   requestedLanguage,
   requestedRegion,
+  elevated = true,
 }: {
   placeId: string;
   apiKey?: string;
   fallbackLabel?: string;
   requestedLanguage?: string;
   requestedRegion?: string;
+  elevated?: boolean;
 }) {
   const requestKey = [
     placeId,
@@ -78,5 +80,5 @@ export function GooglePlaceDetailsCard({
     );
   }
 
-  return <GooglePlaceDetailsView place={currentState.place} />;
+  return <GooglePlaceDetailsView elevated={elevated} place={currentState.place} />;
 }
