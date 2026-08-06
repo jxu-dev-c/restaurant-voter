@@ -21,6 +21,7 @@ type PollRow = {
   center_latitude: number;
   center_longitude: number;
   vote_limit: number;
+  nomination_limit: number;
   nominations_enabled: boolean;
   access_version: number;
   official_winner_candidate_id: string | null;
@@ -33,6 +34,7 @@ type CandidateRow = {
   restaurant_id: string;
   source: CandidateView["source"];
   is_active: boolean;
+  nominated_by_voter_id: string | null;
   restaurants: {
     id: string;
     google_place_id: string;
@@ -42,6 +44,10 @@ type CandidateRow = {
     google_place_id: string;
     fallback_label: string | null;
   }>;
+};
+
+type LoadedCandidateView = CandidateView & {
+  nominatedByVoterId: string | null;
 };
 
 function restaurantFromCandidate(row: CandidateRow) {
@@ -83,11 +89,11 @@ export const getPollAccessRecord = cache(async (publicId: string): Promise<PollA
 async function loadCandidateViews(
   pollId: string,
   options: { includeRemoved: boolean; includeResults: boolean },
-): Promise<CandidateView[]> {
+): Promise<LoadedCandidateView[]> {
   const supabase = createServiceRoleClient();
   let candidateQuery = supabase
     .from("poll_candidates")
-    .select("id,restaurant_id,source,is_active,restaurants!inner(id,google_place_id,fallback_label)")
+    .select("id,restaurant_id,source,is_active,nominated_by_voter_id,restaurants!inner(id,google_place_id,fallback_label)")
     .eq("poll_id", pollId)
     .order("created_at", { ascending: true });
 
@@ -133,6 +139,8 @@ async function loadCandidateViews(
       source: row.source,
       status: row.is_active ? "active" : "removed",
       previousWinnerAt: latestWinByRestaurant.get(row.restaurant_id) ?? null,
+      canRemoveNomination: false,
+      nominatedByVoterId: row.nominated_by_voter_id,
       ...(options.includeResults
         ? {
             voteCount: resultByCandidate.get(row.id)?.vote_count ?? 0,
@@ -143,6 +151,20 @@ async function loadCandidateViews(
   });
 }
 
+function publicCandidateView(
+  candidate: LoadedCandidateView,
+  options: { voterId?: string | null; nominationsOpen?: boolean } = {},
+): CandidateView {
+  const { nominatedByVoterId, ...view } = candidate;
+  return {
+    ...view,
+    canRemoveNomination:
+      options.nominationsOpen === true &&
+      candidate.source === "voter" &&
+      nominatedByVoterId === options.voterId,
+  };
+}
+
 export async function getPublicPollView(
   publicId: string,
   deviceHash?: string | null,
@@ -151,7 +173,7 @@ export async function getPublicPollView(
   const { data: pollData, error: pollError } = await supabase
     .from("polls")
     .select(
-      "id,public_id,title,status,outcome_status,center_name,center_latitude,center_longitude,vote_limit,nominations_enabled,access_version,official_winner_candidate_id,closed_at,created_at",
+      "id,public_id,title,status,outcome_status,center_name,center_latitude,center_longitude,vote_limit,nomination_limit,nominations_enabled,access_version,official_winner_candidate_id,closed_at,created_at",
     )
     .eq("public_id", publicId)
     .maybeSingle();
@@ -160,7 +182,7 @@ export async function getPublicPollView(
   if (!pollData) return null;
   const poll = pollData as PollRow;
 
-  const [candidates, voterResponse] = await Promise.all([
+  const [loadedCandidates, voterResponse] = await Promise.all([
     loadCandidateViews(poll.id, {
       includeRemoved: false,
       includeResults: poll.status === "closed",
@@ -177,6 +199,12 @@ export async function getPublicPollView(
 
   if (voterResponse.error) throw new Error(`Unable to load voter: ${voterResponse.error.message}`);
   const voter = voterResponse.data;
+  const candidates = loadedCandidates.map((candidate) =>
+    publicCandidateView(candidate, {
+      voterId: voter?.id,
+      nominationsOpen: poll.status === "nominations" && poll.nominations_enabled,
+    }),
+  );
   let ballot: PublicPollView["ballot"] = null;
 
   if (voter) {
@@ -209,6 +237,7 @@ export async function getPublicPollView(
     status: poll.status,
     outcomeStatus: poll.outcome_status,
     allowsVoterNominations: poll.nominations_enabled,
+    nominationLimit: poll.nomination_limit,
     maxChoices: poll.vote_limit,
     center: {
       label: poll.center_name,
@@ -287,7 +316,7 @@ export async function getAdminPollDetail(pollId: string): Promise<AdminPollDetai
   const { data: pollData, error: pollError } = await supabase
     .from("polls")
     .select(
-      "id,public_id,title,status,outcome_status,center_name,center_latitude,center_longitude,vote_limit,nominations_enabled,access_version,official_winner_candidate_id,closed_at,created_at",
+      "id,public_id,title,status,outcome_status,center_name,center_latitude,center_longitude,vote_limit,nomination_limit,nominations_enabled,access_version,official_winner_candidate_id,closed_at,created_at",
     )
     .eq("id", pollId)
     .maybeSingle();
@@ -295,7 +324,7 @@ export async function getAdminPollDetail(pollId: string): Promise<AdminPollDetai
   if (!pollData) return null;
   const poll = pollData as PollRow;
 
-  const [candidates, voterResponse, ballotResponse] = await Promise.all([
+  const [loadedCandidates, voterResponse, ballotResponse] = await Promise.all([
     loadCandidateViews(poll.id, {
       includeRemoved: true,
       includeResults: poll.status === "closed",
@@ -304,6 +333,7 @@ export async function getAdminPollDetail(pollId: string): Promise<AdminPollDetai
       .from("poll_voters")
       .select("id,display_name,voter_code")
       .eq("poll_id", poll.id)
+      .is("anonymized_at", null)
       .order("registered_at"),
     supabase
       .from("ballots")
@@ -313,6 +343,7 @@ export async function getAdminPollDetail(pollId: string): Promise<AdminPollDetai
 
   if (voterResponse.error) throw new Error(`Unable to load poll voters: ${voterResponse.error.message}`);
   if (ballotResponse.error) throw new Error(`Unable to load admin ballots: ${ballotResponse.error.message}`);
+  const candidates = loadedCandidates.map((candidate) => publicCandidateView(candidate));
 
   const ballotsByVoter = new Map((ballotResponse.data ?? []).map((ballot) => [ballot.voter_id, ballot]));
   const choicesByBallot = new Map<string, string[]>();
@@ -339,6 +370,7 @@ export async function getAdminPollDetail(pollId: string): Promise<AdminPollDetai
     status: poll.status,
     outcomeStatus: poll.outcome_status,
     allowsVoterNominations: poll.nominations_enabled,
+    nominationLimit: poll.nomination_limit,
     maxChoices: poll.vote_limit,
     center: {
       label: poll.center_name,

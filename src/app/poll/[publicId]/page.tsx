@@ -17,8 +17,8 @@ import { readPollDeviceIdentity } from "@/lib/security/poll-cookies";
 import {
   nominateRestaurantAction,
   registerVoterAction,
+  removeNominationAction,
   saveBallotAction,
-  withdrawBallotAction,
 } from "./actions";
 
 export const metadata: Metadata = {
@@ -43,11 +43,12 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
     placeId: candidate.placeId,
     fallbackLabel: candidate.fallbackLabel,
     previousWinnerAt: candidate.previousWinnerAt,
+    canRemoveNomination: candidate.canRemoveNomination,
   }));
   const registerAction = registerVoterAction.bind(null, publicId);
   const nominateAction = nominateRestaurantAction.bind(null, publicId);
+  const removeNomination = removeNominationAction.bind(null, publicId);
   const saveAction = saveBallotAction.bind(null, publicId);
-  const withdrawAction = withdrawBallotAction.bind(null, publicId);
 
   return (
     <div className="min-h-screen bg-surface-soft">
@@ -59,7 +60,7 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
               {poll.currentVoter.displayName} · {poll.currentVoter.voterCode}
             </span>
           ) : (
-            <span className="status-pill">Referral access</span>
+            <span className="status-pill">Voting Access</span>
           )
         }
       />
@@ -97,6 +98,7 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
             <aside className="h-fit xl:col-start-2 xl:row-start-1 xl:sticky xl:top-6">
               <NominationForm
                 center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
+                nominationLimit={poll.nominationLimit}
                 action={nominateAction}
               />
             </aside>
@@ -109,7 +111,11 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
                   </div>
                 </div>
                 {activeCandidates.length ? (
-                  <CandidateGallery publicId={publicId} candidates={interactiveCandidates} />
+                  <CandidateGallery
+                    publicId={publicId}
+                    candidates={interactiveCandidates}
+                    removeAction={removeNomination}
+                  />
                 ) : (
                   <Notice title="No nominations yet">Be the first person to add a lunch option.</Notice>
                 )}
@@ -128,7 +134,6 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
               revision={poll.ballot?.revision ?? 0}
               maxChoices={poll.maxChoices}
               saveAction={saveAction}
-              withdrawAction={withdrawAction}
             />
           </section>
         ) : null}

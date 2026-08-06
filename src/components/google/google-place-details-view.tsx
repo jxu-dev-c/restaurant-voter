@@ -13,52 +13,6 @@ function googlePhotoLoader({ src }: ImageLoaderProps) {
   return src;
 }
 
-function PhotoAttributions({ place }: { place: GooglePlaceDetails }) {
-  const photo = place.photo;
-  if (!photo) return null;
-
-  const sourceUri = photo.googleMapsUri ?? place.googleMapsUri;
-  if (!photo.attributions.length && !sourceUri) return null;
-
-  return (
-    <figcaption className="mt-2 text-xs text-slate-600">
-      {photo.attributions.length > 0 ? (
-        <>
-          Photo by{" "}
-          {photo.attributions.map((attribution, index) => (
-            <span key={`${attribution.displayName}-${index}`}>
-              {index > 0 ? ", " : null}
-              {attribution.uri ? (
-                <a
-                  className="underline underline-offset-2"
-                  href={attribution.uri}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  {attribution.displayName}
-                </a>
-              ) : (
-                attribution.displayName
-              )}
-            </span>
-          ))}
-        </>
-      ) : null}
-      {photo.attributions.length > 0 && sourceUri ? " · " : null}
-      {sourceUri ? (
-        <a
-          className="underline underline-offset-2"
-          href={sourceUri}
-          rel="noreferrer"
-          target="_blank"
-        >
-          Photo source
-        </a>
-      ) : null}
-    </figcaption>
-  );
-}
-
 export function GooglePlaceDetailsView({
   place,
   compact = false,
@@ -103,7 +57,6 @@ export function GooglePlaceDetailsView({
               Photo unavailable
             </div>
           )}
-          <PhotoAttributions place={place} />
         </figure>
       ) : null}
 

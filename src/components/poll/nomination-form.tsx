@@ -10,10 +10,11 @@ import { SubmissionSuccessDialog } from "./submission-success-dialog";
 
 type NominationFormProps = {
   center: LatLngLiteral;
+  nominationLimit: number;
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
 };
 
-export function NominationForm({ center, action }: NominationFormProps) {
+export function NominationForm({ center, nominationLimit, action }: NominationFormProps) {
   const [selectedPlace, setSelectedPlace] = useState<GooglePlaceDetails | null>(null);
   const [searchKey, setSearchKey] = useState(0);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
@@ -34,7 +35,9 @@ export function NominationForm({ center, action }: NominationFormProps) {
       <form action={formAction} className="panel p-5 sm:p-6">
         <div>
           <h2 className="text-lg font-bold">Nominate a restaurant</h2>
-          <p className="mt-1 text-sm leading-6 text-muted">Up to five nominations per voter. Existing choices are deduplicated automatically.</p>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            Up to {nominationLimit} nomination{nominationLimit === 1 ? "" : "s"} per voter. Existing choices are deduplicated automatically.
+          </p>
         </div>
         <div className="mt-5">
           <PlaceAutocompleteSearch

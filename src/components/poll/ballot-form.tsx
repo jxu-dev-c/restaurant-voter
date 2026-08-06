@@ -17,14 +17,12 @@ type BallotFormProps = {
   revision: number;
   maxChoices: number;
   saveAction: (state: ActionState, formData: FormData) => Promise<ActionState>;
-  withdrawAction: (formData: FormData) => Promise<void>;
 };
 
 type BallotDraft = {
   selected: Set<string>;
   expectedRevision: number;
   dirty: boolean;
-  hasBallot: boolean;
   lastSeenAuthoritativeKey: string;
   remoteChanged: boolean;
 };
@@ -49,7 +47,6 @@ function reconcileAuthoritativeBallot(
     selected: new Set(candidateIds),
     expectedRevision: revision,
     dirty: false,
-    hasBallot: candidateIds.length > 0,
     lastSeenAuthoritativeKey: authoritativeKey,
     remoteChanged: false,
   };
@@ -63,7 +60,6 @@ export function BallotForm({
   revision,
   maxChoices,
   saveAction,
-  withdrawAction,
 }: BallotFormProps) {
   const authoritativeSelection = JSON.stringify(initialCandidateIds);
   const authoritativeKey = `${revision}:${authoritativeSelection}`;
@@ -74,7 +70,6 @@ export function BallotForm({
     selected: new Set(initialCandidateIds),
     expectedRevision: revision,
     dirty: false,
-    hasBallot: initialCandidateIds.length > 0,
     lastSeenAuthoritativeKey: authoritativeKey,
     remoteChanged: false,
   }));
@@ -111,7 +106,6 @@ export function BallotForm({
         selected: new Set(candidateIds),
         expectedRevision: revision,
         dirty: false,
-        hasBallot: candidateIds.length > 0,
         lastSeenAuthoritativeKey: authoritativeKey,
         remoteChanged: false,
       });
@@ -134,21 +128,9 @@ export function BallotForm({
       selected: new Set(candidateIds),
       expectedRevision: revision,
       dirty: false,
-      hasBallot: candidateIds.length > 0,
       lastSeenAuthoritativeKey: authoritativeKey,
       remoteChanged: false,
     });
-  }
-
-  async function handleWithdraw(formData: FormData) {
-    await withdrawAction(formData);
-    setDraft((current) => ({
-      ...current,
-      selected: new Set(),
-      dirty: false,
-      hasBallot: false,
-      remoteChanged: false,
-    }));
   }
 
   return (
@@ -249,15 +231,6 @@ export function BallotForm({
           </span>
         </div>
       </form>
-      {currentDraft.hasBallot ? (
-        <form action={handleWithdraw} className="mt-3">
-          <input type="hidden" name="pollId" value={pollId} />
-          <input type="hidden" name="revision" value={currentDraft.expectedRevision} />
-          <SubmitButton className="button button-danger" pendingLabel="Withdrawing…">
-            Withdraw ballot
-          </SubmitButton>
-        </form>
-      ) : null}
       <SubmissionSuccessDialog
         description="Your choices are saved. You can return using this same link anytime to change them while voting is still open."
         open={successDialogOpen}

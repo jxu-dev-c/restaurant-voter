@@ -9,6 +9,7 @@ import {
   createLunchCenter,
   createPoll,
   duplicatePoll,
+  removePollVoter,
   resolvePollTie,
   rotatePollAccess,
   seedPollCandidate,
@@ -89,6 +90,20 @@ export async function rotatePollAccessAction(formData: FormData) {
   revalidatePath(`/admin/polls/${pollId}`);
 }
 
+export async function deletePollVoterAction(formData: FormData) {
+  const user = await assertAdmin();
+  const pollId = String(formData.get("pollId") ?? "");
+  const voterId = String(formData.get("voterId") ?? "");
+  if (!pollId || !voterId) throw new Error("A poll and voter are required");
+
+  await removePollVoter({
+    pollId,
+    voterId,
+    adminEmail: adminEmail(user),
+  });
+  revalidatePath(`/admin/polls/${pollId}`);
+}
+
 export async function addAdminCandidateAction(formData: FormData) {
   const user = await assertAdmin();
   const pollId = String(formData.get("pollId") ?? "");
@@ -103,7 +118,7 @@ export async function addAdminCandidateAction(formData: FormData) {
     pollId,
     adminEmail: adminEmail(user),
     placeId: place.data.placeId,
-    fallbackLabel: parsed.fallbackLabel,
+    fallbackLabel: place.data.displayName ?? parsed.fallbackLabel,
   });
   revalidatePath(`/admin/polls/${pollId}`);
 }
@@ -135,7 +150,7 @@ export async function addManualWinnerAction(formData: FormData) {
   await addManualWinner({
     adminEmail: adminEmail(user),
     placeId: place.data.placeId,
-    fallbackLabel: parsed.fallbackLabel,
+    fallbackLabel: place.data.displayName ?? parsed.fallbackLabel,
     wonOn: parsed.wonOn,
     notes: parsed.notes,
   });

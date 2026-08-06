@@ -19,13 +19,14 @@ export type CandidateView = {
   source: "admin" | "voter";
   status: "active" | "removed";
   previousWinnerAt: string | null;
+  canRemoveNomination: boolean;
   voteCount?: number;
   resultRank?: number;
 };
 
 export type InteractiveCandidateView = Pick<
   CandidateView,
-  "id" | "placeId" | "fallbackLabel" | "previousWinnerAt"
+  "id" | "placeId" | "fallbackLabel" | "previousWinnerAt" | "canRemoveNomination"
 >;
 
 export type CurrentVoter = {
@@ -47,6 +48,7 @@ export type PublicPollView = {
   status: PollStatus;
   outcomeStatus: OutcomeStatus;
   allowsVoterNominations: boolean;
+  nominationLimit: number;
   maxChoices: number;
   center: {
     label: string;

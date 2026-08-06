@@ -206,7 +206,7 @@ select throws_ok(
     'Unique Six'
   )$$,
   '54000',
-  'A voter may nominate at most five restaurants per poll',
+  'A voter may nominate at most 5 restaurants per poll',
   'sixth voter nomination is rejected'
 );
 

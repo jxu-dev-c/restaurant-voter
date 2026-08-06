@@ -54,7 +54,15 @@ describe("NominationForm", () => {
       message: "Test Restaurant was nominated.",
     });
 
-    render(<NominationForm center={{ lat: 44.65, lng: -63.57 }} action={action} />);
+    render(
+      <NominationForm
+        center={{ lat: 44.65, lng: -63.57 }}
+        nominationLimit={7}
+        action={action}
+      />,
+    );
+
+    expect(screen.getByText(/Up to 7 nominations per voter/)).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Select test restaurant" }));
     expect(screen.getByText("Selected restaurant card")).toBeInTheDocument();

@@ -6,10 +6,11 @@ import { getAuthorizedPoll, requireCurrentPollVoter } from "@/lib/data/access";
 import {
   nominateRestaurant,
   registerPollVoter,
+  removeVoterNomination,
   savePollBallot,
   withdrawPollBallot,
 } from "@/lib/data/mutations";
-import { ballotSchema, placeSelectionSchema } from "@/lib/domain/schemas";
+import { ballotSchema, candidateIdSchema, placeSelectionSchema } from "@/lib/domain/schemas";
 import { validateRestaurantPlace } from "@/lib/google/server-place";
 import { logServerError } from "@/lib/observability/logger";
 import { getOrCreatePollDeviceIdentity } from "@/lib/security/poll-cookies";
@@ -73,13 +74,31 @@ export async function nominateRestaurantAction(
       pollId: poll.id,
       voterId: voter.id,
       placeId: validation.data.placeId,
-      fallbackLabel: parsed.data.fallbackLabel,
+      fallbackLabel: validation.data.displayName ?? parsed.data.fallbackLabel,
     });
     revalidatePath(`/poll/${publicId}`);
     return { ok: true, message: `${validation.data.displayName ?? "Restaurant"} was nominated.` };
   } catch (error) {
     logServerError("poll.nomination.create_failed", error, { publicId });
     return actionError(error, "Unable to nominate that restaurant.");
+  }
+}
+
+export async function removeNominationAction(publicId: string, formData: FormData) {
+  const poll = await getAuthorizedPoll(publicId);
+  if (!poll || poll.status !== "nominations") {
+    throw new Error("Restaurant nominations are closed.");
+  }
+
+  const voter = await requireCurrentPollVoter(publicId, poll.id);
+  const candidateId = candidateIdSchema.parse(formData.get("candidateId"));
+
+  try {
+    await removeVoterNomination({ pollId: poll.id, voterId: voter.id, candidateId });
+    revalidatePath(`/poll/${publicId}`);
+  } catch (error) {
+    logServerError("poll.nomination.remove_failed", error, { publicId, candidateId });
+    throw error;
   }
 }
 

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { GooglePlaceDetailsCard } from "@/components/google";
+import { GooglePlaceDetailsCard, GooglePlaceName } from "@/components/google";
 import { AdminCandidateForm } from "@/components/admin/admin-candidate-form";
 import { PhaseControls } from "@/components/admin/phase-controls";
 import { CopyLinkButton } from "@/components/ui/copy-link-button";
@@ -8,6 +8,7 @@ import { ConfirmActionForm } from "@/components/ui/confirm-action-form";
 import {
   addAdminCandidateAction,
   closePollAction,
+  deletePollVoterAction,
   duplicatePollAction,
   resolveTieAction,
   rotatePollAccessAction,
@@ -35,7 +36,12 @@ export default async function AdminPollPage({ params }: { params: Promise<{ id: 
           <div>
             <span className="status-pill">{poll.status}</span>
             <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] sm:text-4xl">{poll.title}</h1>
-            <p className="mt-2 text-muted">{poll.center.label} · Up to {poll.maxChoices} choices per voter</p>
+            <p className="mt-2 text-muted">
+              {poll.center.label} · Up to {poll.maxChoices} choices per voter
+              {poll.allowsVoterNominations
+                ? ` · Up to ${poll.nominationLimit} nomination${poll.nominationLimit === 1 ? "" : "s"} per voter`
+                : null}
+            </p>
           </div>
           <CopyLinkButton value={referralUrl} />
         </div>
@@ -98,12 +104,47 @@ export default async function AdminPollPage({ params }: { params: Promise<{ id: 
             <div className="mt-5 grid gap-2">
               {poll.voters.length ? poll.voters.map((voter) => (
                 <div className="rounded-xl border border-line bg-white p-3" key={voter.id}>
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="font-semibold">{voter.displayName} · {voter.voterCode}</span>
-                    <span className="text-sm text-muted">{voter.submittedAt ? "Submitted" : "Not submitted"}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm text-muted">{voter.submittedAt ? "Submitted" : "Not submitted"}</span>
+                      {poll.status !== "closed" ? (
+                        <ConfirmActionForm
+                          action={deletePollVoterAction}
+                          confirmLabel="Delete voter"
+                          confirmMessage="Their ballot and all vote choices will be permanently removed, and this browser identity will be blocked from rejoining the poll. Any restaurant they nominated will remain in the candidate roster. This cannot be undone."
+                          confirmTitle={`Delete ${voter.displayName}?`}
+                          tone="danger"
+                        >
+                          <input type="hidden" name="pollId" value={poll.id} />
+                          <input type="hidden" name="voterId" value={voter.id} />
+                          <SubmitButton className="button button-danger" pendingLabel="Deleting voter…">
+                            Delete voter
+                          </SubmitButton>
+                        </ConfirmActionForm>
+                      ) : null}
+                    </div>
                   </div>
                   {poll.status === "closed" && voter.candidateIds?.length ? (
-                    <p className="mt-2 text-sm text-muted">{voter.candidateIds.map((candidateId) => candidateById.get(candidateId)?.fallbackLabel ?? "Unknown").join(", ")}</p>
+                    <p className="mt-2 text-sm text-muted">
+                      {voter.candidateIds.map((candidateId, index) => {
+                        const candidate = candidateById.get(candidateId);
+                        return (
+                          <span key={candidateId}>
+                            {index > 0 ? ", " : null}
+                            {candidate ? (
+                              <GooglePlaceName
+                                className="underline decoration-transparent underline-offset-2 hover:decoration-current"
+                                fallbackLabel={candidate.fallbackLabel}
+                                placeId={candidate.placeId}
+                              />
+                            ) : (
+                              "Unknown"
+                            )}
+                          </span>
+                        );
+                      })}
+                    </p>
                   ) : null}
                 </div>
               )) : <p className="text-muted">No voters have joined yet.</p>}

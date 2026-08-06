@@ -41,6 +41,7 @@ export async function createPoll(input: {
   title: string;
   lunchCenterId: string;
   voteLimit: number;
+  nominationLimit: number;
   nominationsEnabled: boolean;
 }) {
   const supabase = createServiceRoleClient();
@@ -62,6 +63,7 @@ export async function createPoll(input: {
       center_latitude: center!.latitude,
       center_longitude: center!.longitude,
       vote_limit: input.voteLimit,
+      nomination_limit: input.nominationLimit,
       nominations_enabled: input.nominationsEnabled,
       created_by_admin: input.adminEmail,
     })
@@ -76,7 +78,7 @@ export async function duplicatePoll(input: { pollId: string; adminEmail: string 
   const { data: original, error: originalError } = await supabase
     .from("polls")
     .select(
-      "title,lunch_center_id,center_name,center_address,center_google_place_id,center_latitude,center_longitude,vote_limit,nominations_enabled",
+      "title,lunch_center_id,center_name,center_address,center_google_place_id,center_latitude,center_longitude,vote_limit,nomination_limit,nominations_enabled",
     )
     .eq("id", input.pollId)
     .single();
@@ -93,6 +95,7 @@ export async function duplicatePoll(input: { pollId: string; adminEmail: string 
       center_latitude: original!.center_latitude,
       center_longitude: original!.center_longitude,
       vote_limit: original!.vote_limit,
+      nomination_limit: original!.nomination_limit,
       nominations_enabled: original!.nominations_enabled,
       created_by_admin: input.adminEmail,
     })
@@ -218,6 +221,21 @@ export async function registerPollVoter(input: {
   return Array.isArray(data) ? data[0] : data;
 }
 
+export async function removePollVoter(input: {
+  pollId: string;
+  voterId: string;
+  adminEmail: string;
+}) {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase.rpc("remove_poll_voter", {
+    p_poll_id: input.pollId,
+    p_admin_email: input.adminEmail,
+    p_voter_id: input.voterId,
+  });
+  assertNoError(error, "Unable to remove voter");
+  return Array.isArray(data) ? data[0] : data;
+}
+
 export async function nominateRestaurant(input: {
   pollId: string;
   voterId: string;
@@ -233,6 +251,21 @@ export async function nominateRestaurant(input: {
   });
   assertNoError(error, "Unable to nominate restaurant");
   return data;
+}
+
+export async function removeVoterNomination(input: {
+  pollId: string;
+  voterId: string;
+  candidateId: string;
+}) {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase.rpc("remove_voter_nomination", {
+    p_poll_id: input.pollId,
+    p_voter_id: input.voterId,
+    p_candidate_id: input.candidateId,
+  });
+  assertNoError(error, "Unable to remove nomination");
+  return Array.isArray(data) ? data[0] : data;
 }
 
 export async function savePollBallot(input: {

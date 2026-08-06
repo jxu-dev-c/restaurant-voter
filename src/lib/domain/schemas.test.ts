@@ -7,10 +7,12 @@ describe("domain form schemas", () => {
       title: "Friday lunch",
       lunchCenterId: "c3be4471-3589-48ed-aeed-f82bb9084cd2",
       voteLimit: "3",
+      nominationLimit: "7",
       nominationsEnabled: "on",
     });
 
     expect(parsed.voteLimit).toBe(3);
+    expect(parsed.nominationLimit).toBe(7);
     expect(parsed.nominationsEnabled).toBe(true);
   });
 

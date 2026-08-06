@@ -26,6 +26,11 @@ export function CreatePollForm({ centers, action }: CreatePollFormProps) {
         <label className="field-label" htmlFor="voteLimit">Choices per voter</label>
         <input className="field" id="voteLimit" name="voteLimit" type="number" min={1} max={10} defaultValue={3} required />
       </div>
+      <div>
+        <label className="field-label" htmlFor="nominationLimit">Nominations per voter</label>
+        <input className="field" id="nominationLimit" name="nominationLimit" type="number" min={1} max={50} defaultValue={5} required />
+        <p className="mt-2 text-sm text-muted">Used only when voter nominations are enabled.</p>
+      </div>
       <label className="flex items-start gap-3 rounded-2xl border border-line bg-surface-soft p-4">
         <input className="mt-1 h-4 w-4 accent-[#ff6f3d]" type="checkbox" name="nominationsEnabled" defaultChecked />
         <span>

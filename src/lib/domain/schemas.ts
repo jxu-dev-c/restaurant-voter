@@ -26,6 +26,7 @@ export const createPollSchema = z.object({
   title: z.string().trim().min(3, "Enter a poll title.").max(100),
   lunchCenterId: z.string().uuid("Choose a lunch center."),
   voteLimit: z.coerce.number().int().min(1).max(10),
+  nominationLimit: z.coerce.number().int().min(1).max(50),
   nominationsEnabled: booleanFromForm,
 });
 
@@ -40,6 +41,8 @@ export const ballotSchema = z.object({
   revision: z.coerce.number().int().min(0),
   candidateIds: z.array(z.string().uuid()).max(50),
 });
+
+export const candidateIdSchema = z.string().uuid();
 
 export const winnerSchema = z.object({
   placeId: z.string().trim().min(8).max(255),

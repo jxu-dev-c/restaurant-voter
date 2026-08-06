@@ -35,13 +35,13 @@ describe("BallotForm", () => {
             placeId: "place-id",
             fallbackLabel: "Test Restaurant",
             previousWinnerAt: null,
+            canRemoveNomination: false,
           },
         ]}
         initialCandidateIds={[]}
         revision={0}
         maxChoices={2}
         saveAction={saveAction}
-        withdrawAction={vi.fn()}
       />,
     );
 
@@ -70,13 +70,13 @@ describe("BallotForm", () => {
             placeId: "place-id",
             fallbackLabel: "Test Restaurant",
             previousWinnerAt: null,
+            canRemoveNomination: false,
           },
         ]}
         initialCandidateIds={[]}
         revision={0}
         maxChoices={2}
         saveAction={vi.fn()}
-        withdrawAction={vi.fn()}
       />,
     );
 
