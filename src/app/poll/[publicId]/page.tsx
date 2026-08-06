@@ -69,7 +69,11 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
             <div>
               <span className="status-pill">{poll.status}</span>
               <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] sm:text-5xl">{poll.title}</h1>
-              <p className="mt-3 text-muted">Driving estimates start from {poll.center.label}.</p>
+              <p className="mt-3 text-muted">
+                {poll.status === "closed"
+                  ? `Voting closed ${formatDate(poll.closedAt)}.`
+                  : `Driving estimates start from ${poll.center.label}.`}
+              </p>
               {poll.currentVoter && (poll.status === "nominations" || poll.status === "voting") ? (
                 <PollMapDialog
                   center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
@@ -130,29 +134,20 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
         ) : null}
 
         {poll.status === "closed" ? (
-          <div className="mt-7 grid gap-7 xl:grid-cols-[minmax(0,1fr)_390px]">
-            <section className="min-w-0">
-              {poll.outcomeStatus === "no_votes" ? (
-                <Notice title="No result" tone="warning">The poll closed without a submitted ballot.</Notice>
-              ) : null}
-              {poll.outcomeStatus === "tie" ? (
-                <Notice title="The leaders are tied" tone="warning">The organizer is choosing one official winner from the tied restaurants.</Notice>
-              ) : null}
-              {poll.winnerCandidateId ? (
-                <Notice title="We have a winner" tone="success">The official winner is highlighted below.</Notice>
-              ) : null}
-              <div className="mt-5">
-                <ResultsList candidates={activeCandidates} winnerCandidateId={poll.winnerCandidateId} />
-              </div>
-            </section>
-            <aside className="h-fit space-y-4 xl:sticky xl:top-6">
-              <div className="panel p-5">
-                <p className="eyebrow">Final result</p>
-                <p className="mt-3 text-sm leading-6 text-muted">Closed {formatDate(poll.closedAt)}. Counts are final; only an unresolved tie can still receive an official winner.</p>
-              </div>
-              <CandidateGallery publicId={publicId} candidates={interactiveCandidates} />
-            </aside>
-          </div>
+          <section className="mt-7 min-w-0">
+            {poll.outcomeStatus === "no_votes" ? (
+              <Notice title="No result" tone="warning">The poll closed without a submitted ballot.</Notice>
+            ) : null}
+            {poll.outcomeStatus === "tie" ? (
+              <Notice title="The leaders are tied" tone="warning">The organizer is choosing one official winner from the tied restaurants.</Notice>
+            ) : null}
+            {poll.winnerCandidateId ? (
+              <Notice title="We have a winner" tone="success">The official winner is highlighted below.</Notice>
+            ) : null}
+            <div className="mt-5">
+              <ResultsList candidates={activeCandidates} winnerCandidateId={poll.winnerCandidateId} />
+            </div>
+          </section>
         ) : null}
       </main>
     </div>

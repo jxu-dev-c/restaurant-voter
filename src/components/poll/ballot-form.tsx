@@ -172,7 +172,15 @@ export function BallotForm({
             return (
               <div
                 key={candidate.id}
-                className={`panel p-4 transition ${checked ? "border-accent bg-[#fff8f4]" : "hover:border-[#bcc7bc]"}`}
+                className={`panel p-4 transition ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${checked ? "border-accent bg-[#fff8f4]" : "hover:border-[#bcc7bc]"}`}
+                onClick={(event) => {
+                  const target = event.target;
+                  const clickedInteractiveElement =
+                    target instanceof Element &&
+                    target.closest("a, button, input, label, select, textarea, [role='button']");
+
+                  if (!disabled && !clickedInteractiveElement) toggle(candidate.id);
+                }}
               >
                 <div className="flex items-center gap-3">
                   <input

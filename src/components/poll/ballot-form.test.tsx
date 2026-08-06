@@ -6,7 +6,10 @@ import { BallotForm } from "./ballot-form";
 
 vi.mock("@/components/google", () => ({
   GooglePlaceDetailsCard: ({ fallbackLabel }: { fallbackLabel: string }) => (
-    <div>{fallbackLabel}</div>
+    <div>
+      <span>{fallbackLabel}</span>
+      <a href="#details">View details</a>
+    </div>
   ),
 }));
 
@@ -42,14 +45,45 @@ describe("BallotForm", () => {
       />,
     );
 
-    await user.click(
+    await user.click(screen.getByText("Test Restaurant"));
+    expect(
       screen.getByRole("checkbox", { name: "Restaurant option 1: include in ballot" }),
-    );
+    ).toBeChecked();
     await user.click(screen.getByRole("button", { name: "Save ballot" }));
 
     expect(await screen.findByRole("dialog", { name: "Vote saved" })).toHaveTextContent(
       "You can return using this same link anytime to change them while voting is still open.",
     );
     expect(saveAction).toHaveBeenCalledOnce();
+  });
+
+  it("does not change the selection when a link inside the card is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <BallotForm
+        pollId="poll-id"
+        publicId="public-id"
+        candidates={[
+          {
+            id: "candidate-id",
+            placeId: "place-id",
+            fallbackLabel: "Test Restaurant",
+            previousWinnerAt: null,
+          },
+        ]}
+        initialCandidateIds={[]}
+        revision={0}
+        maxChoices={2}
+        saveAction={vi.fn()}
+        withdrawAction={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("link", { name: "View details" }));
+
+    expect(
+      screen.getByRole("checkbox", { name: "Restaurant option 1: include in ballot" }),
+    ).not.toBeChecked();
   });
 });
