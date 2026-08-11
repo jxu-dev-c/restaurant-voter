@@ -30,6 +30,12 @@ export const createPollSchema = z.object({
   nominationsEnabled: booleanFromForm,
 });
 
+export const updatePollLimitsSchema = z.object({
+  pollId: z.string().uuid(),
+  voteLimit: z.coerce.number().int().min(1).max(10),
+  nominationLimit: z.coerce.number().int().min(1).max(50),
+});
+
 export const placeSelectionSchema = z.object({
   placeId: z.string().trim().min(8).max(255),
   fallbackLabel: optionalText.pipe(z.string().max(160).optional()),

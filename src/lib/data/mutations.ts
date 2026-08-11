@@ -139,6 +139,25 @@ export async function transitionPoll(input: {
   assertNoError(error, "Unable to transition poll");
 }
 
+export async function updatePollLimits(input: {
+  pollId: string;
+  adminEmail: string;
+  voteLimit: number;
+  nominationLimit: number;
+}) {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase.rpc("update_poll_limits", {
+    p_poll_id: input.pollId,
+    p_admin_email: input.adminEmail,
+    p_vote_limit: input.voteLimit,
+    p_nomination_limit: input.nominationLimit,
+  });
+  assertNoError(error, "Unable to update poll limits");
+  const poll = (Array.isArray(data) ? data[0] : data) as { public_id?: string } | null;
+  if (!poll?.public_id) throw new Error("Unable to update poll limits: Poll response is missing");
+  return { public_id: poll.public_id };
+}
+
 export async function closePoll(input: { pollId: string; adminEmail: string }) {
   const supabase = createServiceRoleClient();
   const { data, error } = await supabase.rpc("close_poll", {

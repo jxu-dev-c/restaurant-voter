@@ -4,6 +4,7 @@ import { AdminCandidateForm } from "@/components/admin/admin-candidate-form";
 import { CandidateRoster } from "@/components/admin/candidate-roster";
 import { ParticipationList } from "@/components/admin/participation-list";
 import { PhaseControls } from "@/components/admin/phase-controls";
+import { PollLimitForm } from "@/components/admin/poll-limit-form";
 import { CopyLinkButton } from "@/components/ui/copy-link-button";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { ConfirmActionForm } from "@/components/ui/confirm-action-form";
@@ -16,6 +17,7 @@ import {
   rotatePollAccessAction,
   toggleCandidateAction,
   transitionPollAction,
+  updatePollLimitsAction,
 } from "@/app/admin/actions";
 import { getAdminPollDetail } from "@/lib/data/polls";
 import { getPublicEnvironment } from "@/lib/env";
@@ -29,6 +31,7 @@ export default async function AdminPollPage({ params }: { params: Promise<{ id: 
   const token = createReferralToken({ pollPublicId: poll.publicId, accessVersion: poll.accessVersion });
   const referralUrl = new URL(`/join/${token}`, getPublicEnvironment().appUrl).toString();
   const canEditCandidates = poll.status === "draft" || poll.status === "nominations";
+  const activeCandidateCount = poll.candidates.filter((candidate) => candidate.status === "active").length;
 
   return (
     <div className="space-y-6">
@@ -106,10 +109,13 @@ export default async function AdminPollPage({ params }: { params: Promise<{ id: 
             <p className="eyebrow">Poll settings</p>
             <dl className="mt-4 grid grid-cols-2 gap-4">
               <div><dt className="admin-data-label">Center</dt><dd className="admin-data-value">{poll.center.label}</dd></div>
-              <div><dt className="admin-data-label">Choices</dt><dd className="admin-data-value">Up to {poll.maxChoices}</dd></div>
-              <div><dt className="admin-data-label">Nominations</dt><dd className="admin-data-value">{poll.allowsVoterNominations ? `Up to ${poll.nominationLimit}` : "Off"}</dd></div>
               <div><dt className="admin-data-label">Access version</dt><dd className="admin-data-value">{poll.accessVersion}</dd></div>
             </dl>
+            <PollLimitForm
+              action={updatePollLimitsAction}
+              activeCandidateCount={activeCandidateCount}
+              poll={poll}
+            />
             <details className="mt-5 border-t border-line pt-4">
               <summary className="cursor-pointer font-bold">Advanced actions</summary>
               <div className="mt-4 grid gap-3">

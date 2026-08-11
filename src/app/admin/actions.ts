@@ -15,12 +15,14 @@ import {
   seedPollCandidate,
   setPollCandidateActive,
   transitionPoll,
+  updatePollLimits,
 } from "@/lib/data/mutations";
 import {
   centerSchema,
   createPollSchema,
   formDataObject,
   placeSelectionSchema,
+  updatePollLimitsSchema,
   winnerSchema,
 } from "@/lib/domain/schemas";
 import { pollStatuses } from "@/lib/domain/types";
@@ -65,6 +67,18 @@ export async function transitionPollAction(formData: FormData) {
     targetStatus: targetStatus as (typeof pollStatuses)[number],
   });
   revalidatePath(`/admin/polls/${pollId}`);
+}
+
+export async function updatePollLimitsAction(formData: FormData) {
+  const user = await assertAdmin();
+  const input = updatePollLimitsSchema.parse(formDataObject(formData));
+  const poll = await updatePollLimits({
+    ...input,
+    adminEmail: adminEmail(user),
+  });
+  revalidatePath(`/admin/polls/${input.pollId}`);
+  revalidatePath(`/poll/${poll.public_id}`);
+  revalidatePath("/admin");
 }
 
 export async function closePollAction(formData: FormData) {

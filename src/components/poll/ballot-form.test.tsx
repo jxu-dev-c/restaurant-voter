@@ -18,6 +18,36 @@ vi.mock("./use-route-metrics", () => ({
 }));
 
 describe("BallotForm", () => {
+  it("allows additional selections when the choice limit increases", async () => {
+    const user = userEvent.setup();
+    const candidates = ["One", "Two", "Three"].map((label, index) => ({
+      id: `candidate-${index}`,
+      placeId: `place-${index}`,
+      fallbackLabel: `Restaurant ${label}`,
+      previousWinnerAt: null,
+      canRemoveNomination: false,
+    }));
+    const props = {
+      pollId: "poll-id",
+      publicId: "public-id",
+      candidates,
+      initialCandidateIds: [],
+      revision: 0,
+      saveAction: vi.fn(),
+    };
+    const { rerender } = render(<BallotForm {...props} maxChoices={1} />);
+
+    await user.click(screen.getByText("Restaurant One"));
+    expect(screen.getByRole("checkbox", { name: "Restaurant option 2: include in ballot" })).toBeDisabled();
+
+    rerender(<BallotForm {...props} maxChoices={3} />);
+    await user.click(screen.getByText("Restaurant Two"));
+    await user.click(screen.getByText("Restaurant Three"));
+
+    expect(screen.getByText("3 selected")).toBeInTheDocument();
+    expect(screen.getByText("Choose up to 3")).toBeInTheDocument();
+  });
+
   it("confirms a successful vote can be changed later using the same link", async () => {
     const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({

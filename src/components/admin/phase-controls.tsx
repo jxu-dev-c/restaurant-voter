@@ -45,7 +45,7 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
             })}
           </ol>
           <p className="mt-5 text-sm leading-6 text-muted">
-            Phase changes are one-way. Restaurant choices and poll settings lock when voting begins.
+            Phase changes are one-way. The shortlist and nomination limit lock when voting begins; the choice limit may still increase.
           </p>
         </div>
 
