@@ -1,11 +1,5 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/site-header";
-
-const navItems = [
-  { href: "/admin", label: "Polls" },
-  { href: "/admin/centers", label: "Lunch centers" },
-  { href: "/admin/winners", label: "Winner history" },
-];
+import { AdminNav } from "@/components/admin/admin-nav";
 
 type AdminShellProps = {
   children: React.ReactNode;
@@ -15,37 +9,51 @@ type AdminShellProps = {
 
 export function AdminShell({ children, email, signOutAction }: AdminShellProps) {
   return (
-    <div className="min-h-screen bg-surface-soft">
-      <SiteHeader
-        backHref="/admin"
-        backLabel="Admin"
-        trailing={
+    <div className="admin-root min-h-screen">
+      <header className="admin-mobile-header">
+        <Link href="/admin" className="brand-mark" aria-label="LunchPick admin home">
+          <span aria-hidden="true">LP</span>
+          <span>LunchPick</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <Link className="button button-primary button-compact" href="/admin/polls/new">
+            New poll
+          </Link>
           <form action={signOutAction}>
-            <button className="button button-secondary" type="submit">
+            <button className="button button-secondary button-compact" type="submit">
               Sign out
             </button>
           </form>
-        }
-      />
-      <div className="shell grid gap-6 py-6 lg:grid-cols-[230px_1fr] lg:py-10">
-        <aside className="panel h-fit p-3">
-          <div className="border-b border-line px-3 pb-4 pt-2">
+        </div>
+      </header>
+
+      <div className="admin-mobile-nav overflow-x-auto">
+        <AdminNav compact />
+      </div>
+
+      <div className="admin-shell">
+        <aside className="admin-sidebar">
+          <Link href="/admin" className="brand-mark" aria-label="LunchPick admin home">
+            <span aria-hidden="true">LP</span>
+            <span>LunchPick</span>
+          </Link>
+          <div className="mt-8">
+            <AdminNav />
+          </div>
+          <Link className="button button-primary mt-5 w-full" href="/admin/polls/new">
+            New poll
+          </Link>
+          <div className="mt-auto border-t border-line pt-5">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-subtle">Signed in as</p>
             <p className="mt-1 truncate text-sm font-semibold">{email}</p>
+            <form action={signOutAction} className="mt-4">
+              <button className="button button-secondary w-full" type="submit">
+                Sign out
+              </button>
+            </form>
           </div>
-          <nav className="mt-2 grid gap-1" aria-label="Admin navigation">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                className="rounded-xl px-3 py-2.5 text-sm font-semibold text-muted hover:bg-surface-soft hover:text-ink"
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
         </aside>
-        <main className="min-w-0">{children}</main>
+        <main className="admin-main">{children}</main>
       </div>
     </div>
   );

@@ -9,15 +9,17 @@ export function AdminCandidateForm({
   pollId,
   center,
   action,
+  embedded = false,
 }: {
   pollId: string;
   center: LatLngLiteral;
   action: (formData: FormData) => Promise<void>;
+  embedded?: boolean;
 }) {
   const [place, setPlace] = useState<GooglePlaceDetails | null>(null);
 
   return (
-    <form action={action} className="panel p-5">
+    <form action={action} className={embedded ? "p-5 sm:p-6" : "panel p-5"}>
       <h2 className="font-bold">Add an admin candidate</h2>
       <p className="mt-1 text-sm leading-6 text-muted">Candidates can be changed only before voting starts.</p>
       <div className="mt-4">

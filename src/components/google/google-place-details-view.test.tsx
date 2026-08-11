@@ -29,4 +29,13 @@ describe("GooglePlaceDetailsView", () => {
 
     expect(screen.getByRole("article")).not.toHaveClass("shadow-sm");
   });
+
+  it("renders a compact management row without card semantics", () => {
+    render(<GooglePlaceDetailsView place={place} variant="admin-row" />);
+
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.getByText("Test Restaurant")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Google Maps" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Photo unavailable" })).toBeInTheDocument();
+  });
 });

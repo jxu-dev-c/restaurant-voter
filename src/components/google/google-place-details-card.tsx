@@ -14,6 +14,7 @@ export function GooglePlaceDetailsCard({
   requestedLanguage,
   requestedRegion,
   elevated = true,
+  variant = "card",
 }: {
   placeId: string;
   apiKey?: string;
@@ -21,6 +22,7 @@ export function GooglePlaceDetailsCard({
   requestedLanguage?: string;
   requestedRegion?: string;
   elevated?: boolean;
+  variant?: "card" | "admin-row";
 }) {
   const requestKey = [
     placeId,
@@ -60,7 +62,7 @@ export function GooglePlaceDetailsCard({
   if (currentState?.error) {
     return (
       <div
-        className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600"
+        className={variant === "admin-row" ? "rounded-xl bg-slate-50 p-4 text-sm text-slate-600" : "rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600"}
         role="status"
       >
         <p className="font-medium text-slate-900">{fallbackLabel}</p>
@@ -72,7 +74,7 @@ export function GooglePlaceDetailsCard({
   if (!currentState?.place) {
     return (
       <div
-        className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-500"
+        className={variant === "admin-row" ? "animate-pulse rounded-xl bg-slate-50 p-4 text-sm text-slate-500" : "animate-pulse rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-500"}
         role="status"
       >
         Loading {fallbackLabel} details…
@@ -80,5 +82,5 @@ export function GooglePlaceDetailsCard({
     );
   }
 
-  return <GooglePlaceDetailsView elevated={elevated} place={currentState.place} />;
+  return <GooglePlaceDetailsView elevated={elevated} place={currentState.place} variant={variant} />;
 }

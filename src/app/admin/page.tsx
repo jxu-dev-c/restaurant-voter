@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { PollCard } from "@/components/admin/poll-card";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { PollDashboard } from "@/components/admin/poll-dashboard";
 import { listAdminPolls } from "@/lib/data/polls";
 
 export default async function AdminDashboardPage() {
@@ -7,27 +8,23 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Admin dashboard</p>
-          <h1 className="section-title mt-3">Lunch polls</h1>
-          <p className="mt-3 text-muted">Create the shortlist, share a referral link, and close the vote when the team is ready.</p>
-        </div>
-        <Link className="button button-primary" href="/admin/polls/new">New poll</Link>
-      </div>
+      <AdminPageHeader
+        actions={<Link className="button button-primary" href="/admin/polls/new">New poll</Link>}
+        description="See what needs attention, move polls forward safely, and keep lunch decisions on track."
+        eyebrow="Admin dashboard"
+        title="Lunch polls"
+      />
 
-      <div className="mt-8 grid gap-4">
-        {polls.length ? polls.map((poll) => <PollCard poll={poll} key={poll.id} />) : (
-          <div className="panel p-8 text-center">
+      {polls.length ? <PollDashboard polls={polls} /> : (
+        <div className="admin-section mt-8 p-8 text-center">
             <h2 className="text-xl font-bold">No lunch polls yet</h2>
             <p className="mt-2 text-muted">Add a lunch center, then create the first poll.</p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <Link className="button button-secondary" href="/admin/centers">Add a center</Link>
               <Link className="button button-primary" href="/admin/polls/new">Create a poll</Link>
             </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

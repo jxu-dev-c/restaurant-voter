@@ -1,15 +1,18 @@
 import { CreatePollForm } from "@/components/admin/create-poll-form";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { createPollAction } from "@/app/admin/actions";
 import { listLunchCenters } from "@/lib/data/polls";
 
 export default async function NewPollPage() {
   const centers = await listLunchCenters();
   return (
-    <div className="mx-auto max-w-2xl">
-      <p className="eyebrow">New lunch poll</p>
-      <h1 className="section-title mt-3">Set the table.</h1>
-      <p className="mt-3 text-muted">The draft remains private until you open nominations or voting.</p>
-      <div className="mt-8"><CreatePollForm centers={centers} action={createPollAction} /></div>
+    <div>
+      <AdminPageHeader
+        description="Set the center and participation rules now. You can curate restaurants safely while the poll remains a private draft."
+        eyebrow="New lunch poll"
+        title="Set the table"
+      />
+      <div className="mt-8 max-w-3xl"><CreatePollForm centers={centers} action={createPollAction} /></div>
     </div>
   );
 }

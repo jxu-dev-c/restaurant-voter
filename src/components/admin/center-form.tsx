@@ -6,7 +6,12 @@ type CenterFormProps = {
 
 export function CenterForm({ action }: CenterFormProps) {
   return (
-    <form action={action} className="panel grid gap-5 p-6 sm:grid-cols-2">
+    <form action={action} className="admin-section grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
+      <div className="sm:col-span-2">
+        <p className="eyebrow">Add a center</p>
+        <h2 className="mt-2 text-xl font-bold">Save a reusable location</h2>
+        <p className="mt-2 text-sm leading-6 text-muted">Use the coordinates of the office or meetup point that restaurant searches should orbit.</p>
+      </div>
       <div className="sm:col-span-2">
         <label className="field-label" htmlFor="name">Center name</label>
         <input className="field" id="name" name="name" placeholder="Downtown office" required maxLength={80} />
@@ -25,7 +30,7 @@ export function CenterForm({ action }: CenterFormProps) {
       </div>
       <input type="hidden" name="googlePlaceId" value="" />
       <div className="sm:col-span-2">
-        <SubmitButton pendingLabel="Adding center…">Add lunch center</SubmitButton>
+        <SubmitButton className="button button-primary w-full" pendingLabel="Adding center…">Add lunch center</SubmitButton>
       </div>
     </form>
   );

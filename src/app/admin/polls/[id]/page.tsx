@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
-import { GooglePlaceDetailsCard, GooglePlaceName } from "@/components/google";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCandidateForm } from "@/components/admin/admin-candidate-form";
+import { CandidateRoster } from "@/components/admin/candidate-roster";
+import { ParticipationList } from "@/components/admin/participation-list";
 import { PhaseControls } from "@/components/admin/phase-controls";
 import { CopyLinkButton } from "@/components/ui/copy-link-button";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -27,133 +29,105 @@ export default async function AdminPollPage({ params }: { params: Promise<{ id: 
   const token = createReferralToken({ pollPublicId: poll.publicId, accessVersion: poll.accessVersion });
   const referralUrl = new URL(`/join/${token}`, getPublicEnvironment().appUrl).toString();
   const canEditCandidates = poll.status === "draft" || poll.status === "nominations";
-  const candidateById = new Map(poll.candidates.map((candidate) => [candidate.id, candidate]));
 
   return (
     <div className="space-y-6">
-      <section className="panel p-6 sm:p-7">
-        <div className="flex flex-wrap items-start justify-between gap-5">
-          <div>
-            <span className="status-pill">{poll.status}</span>
-            <h1 className="mt-4 text-3xl font-black tracking-[-0.045em] sm:text-4xl">{poll.title}</h1>
-            <p className="mt-2 text-muted">
-              {poll.center.label} · Up to {poll.maxChoices} choices per voter
-              {poll.allowsVoterNominations
-                ? ` · Up to ${poll.nominationLimit} nomination${poll.nominationLimit === 1 ? "" : "s"} per voter`
-                : null}
-            </p>
-          </div>
-          <CopyLinkButton value={referralUrl} />
-        </div>
-        <div className="mt-6 rounded-2xl border border-line bg-surface-soft p-4">
-          <p className="break-all font-mono text-xs text-muted">{referralUrl}</p>
-          <ConfirmActionForm
-            action={rotatePollAccessAction}
-            className="mt-3"
-            confirmMessage="Rotate this referral link? Every earlier link and existing poll-access grant will stop working."
-          >
-            <input type="hidden" name="pollId" value={poll.id} />
-            <SubmitButton className="button button-secondary" pendingLabel="Rotating link…">Rotate referral link</SubmitButton>
-          </ConfirmActionForm>
-          <form action={duplicatePollAction} className="mt-3">
-            <input type="hidden" name="pollId" value={poll.id} />
-            <SubmitButton className="button button-secondary" pendingLabel="Duplicating poll…">Duplicate as a new draft</SubmitButton>
-          </form>
-        </div>
-      </section>
+      <AdminPageHeader
+        actions={<CopyLinkButton value={referralUrl} />}
+        badge={<span className="status-pill" data-status={poll.status}>{poll.status}</span>}
+        description={(
+          <>
+            {poll.center.label} · Up to {poll.maxChoices} choices per voter
+            {poll.allowsVoterNominations
+              ? ` · Up to ${poll.nominationLimit} nomination${poll.nominationLimit === 1 ? "" : "s"} per voter`
+              : " · Admin-managed shortlist"}
+          </>
+        )}
+        eyebrow="Poll workspace"
+        title={poll.title}
+      />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <PhaseControls
+        closeAction={closePollAction}
+        poll={poll}
+        resolveTieAction={resolveTieAction}
+        transitionAction={transitionPollAction}
+      />
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_330px] xl:items-start">
         <div className="space-y-6">
-          <section className="panel p-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <p className="eyebrow">Candidate roster</p>
-                <h2 className="mt-2 text-2xl font-bold">{poll.candidates.filter((item) => item.status === "active").length} active restaurants</h2>
-              </div>
-              {!canEditCandidates ? <span className="status-pill">Locked</span> : null}
-            </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {poll.candidates.map((candidate) => (
-                <article className={`rounded-2xl border p-3 ${candidate.status === "removed" ? "border-line bg-surface-soft opacity-65" : "border-line bg-white"}`} key={candidate.id}>
-                  <GooglePlaceDetailsCard placeId={candidate.placeId} fallbackLabel={candidate.fallbackLabel} />
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-muted">{candidate.source} · {candidate.status}</span>
-                    {canEditCandidates ? (
-                      <form action={toggleCandidateAction}>
-                        <input type="hidden" name="pollId" value={poll.id} />
-                        <input type="hidden" name="candidateId" value={candidate.id} />
-                        <input type="hidden" name="active" value={candidate.status === "removed" ? "true" : "false"} />
-                        <SubmitButton className="button button-secondary" pendingLabel="Updating…">
-                          {candidate.status === "removed" ? "Restore" : "Remove"}
-                        </SubmitButton>
-                      </form>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+          <CandidateRoster
+            candidates={poll.candidates}
+            canEdit={canEditCandidates}
+            pollId={poll.id}
+            toggleAction={toggleCandidateAction}
+          />
 
           {canEditCandidates ? (
-            <AdminCandidateForm pollId={poll.id} center={{ lat: poll.center.latitude, lng: poll.center.longitude }} action={addAdminCandidateAction} />
+            <details className="admin-section overflow-hidden" open={poll.candidates.length === 0}>
+              <summary className="cursor-pointer list-none px-5 py-4 font-bold sm:px-6">
+                <span className="flex items-center justify-between gap-3">
+                  <span>Add a restaurant</span>
+                  <span className="text-sm font-semibold text-muted">Search Google Maps</span>
+                </span>
+              </summary>
+              <div className="border-t border-line">
+                <AdminCandidateForm
+                  action={addAdminCandidateAction}
+                  center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
+                  embedded
+                  pollId={poll.id}
+                />
+              </div>
+            </details>
           ) : null}
 
-          <section className="panel p-6">
-            <p className="eyebrow">Participation</p>
-            <h2 className="mt-2 text-2xl font-bold">{poll.voters.filter((voter) => voter.submittedAt).length} submitted ballots</h2>
-            <div className="mt-5 grid gap-2">
-              {poll.voters.length ? poll.voters.map((voter) => (
-                <div className="rounded-xl border border-line bg-white p-3" key={voter.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="font-semibold">{voter.displayName} · {voter.voterCode}</span>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-muted">{voter.submittedAt ? "Submitted" : "Not submitted"}</span>
-                      {poll.status !== "closed" ? (
-                        <ConfirmActionForm
-                          action={deletePollVoterAction}
-                          confirmLabel="Delete voter"
-                          confirmMessage="Their ballot and all vote choices will be permanently removed, and this browser identity will be blocked from rejoining the poll. Any restaurant they nominated will remain in the candidate roster. This cannot be undone."
-                          confirmTitle={`Delete ${voter.displayName}?`}
-                          tone="danger"
-                        >
-                          <input type="hidden" name="pollId" value={poll.id} />
-                          <input type="hidden" name="voterId" value={voter.id} />
-                          <SubmitButton className="button button-danger" pendingLabel="Deleting voter…">
-                            Delete voter
-                          </SubmitButton>
-                        </ConfirmActionForm>
-                      ) : null}
-                    </div>
-                  </div>
-                  {poll.status === "closed" && voter.candidateIds?.length ? (
-                    <p className="mt-2 text-sm text-muted">
-                      {voter.candidateIds.map((candidateId, index) => {
-                        const candidate = candidateById.get(candidateId);
-                        return (
-                          <span key={candidateId}>
-                            {index > 0 ? ", " : null}
-                            {candidate ? (
-                              <GooglePlaceName
-                                className="underline decoration-transparent underline-offset-2 hover:decoration-current"
-                                fallbackLabel={candidate.fallbackLabel}
-                                placeId={candidate.placeId}
-                              />
-                            ) : (
-                              "Unknown"
-                            )}
-                          </span>
-                        );
-                      })}
-                    </p>
-                  ) : null}
-                </div>
-              )) : <p className="text-muted">No voters have joined yet.</p>}
-            </div>
-          </section>
+          <ParticipationList
+            candidates={poll.candidates}
+            deleteAction={deletePollVoterAction}
+            pollId={poll.id}
+            pollStatus={poll.status}
+            voters={poll.voters}
+          />
         </div>
 
-        <aside className="h-fit xl:sticky xl:top-6">
-          <PhaseControls poll={poll} transitionAction={transitionPollAction} closeAction={closePollAction} resolveTieAction={resolveTieAction} />
+        <aside className="space-y-4 xl:sticky xl:top-6">
+          <section className="admin-section p-5">
+            <p className="eyebrow">Share and access</p>
+            <h2 className="mt-2 text-lg font-bold">Invite the team</h2>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              This link handles joining, nominations, voting, and results as the poll moves through each phase.
+            </p>
+            <p className="mt-4 break-all rounded-xl bg-surface-soft p-3 font-mono text-xs leading-5 text-muted">{referralUrl}</p>
+            <div className="mt-4"><CopyLinkButton value={referralUrl} /></div>
+          </section>
+
+          <section className="admin-section p-5">
+            <p className="eyebrow">Poll settings</p>
+            <dl className="mt-4 grid grid-cols-2 gap-4">
+              <div><dt className="admin-data-label">Center</dt><dd className="admin-data-value">{poll.center.label}</dd></div>
+              <div><dt className="admin-data-label">Choices</dt><dd className="admin-data-value">Up to {poll.maxChoices}</dd></div>
+              <div><dt className="admin-data-label">Nominations</dt><dd className="admin-data-value">{poll.allowsVoterNominations ? `Up to ${poll.nominationLimit}` : "Off"}</dd></div>
+              <div><dt className="admin-data-label">Access version</dt><dd className="admin-data-value">{poll.accessVersion}</dd></div>
+            </dl>
+            <details className="mt-5 border-t border-line pt-4">
+              <summary className="cursor-pointer font-bold">Advanced actions</summary>
+              <div className="mt-4 grid gap-3">
+                <form action={duplicatePollAction}>
+                  <input type="hidden" name="pollId" value={poll.id} />
+                  <SubmitButton className="button button-secondary w-full" pendingLabel="Duplicating poll…">Duplicate as a new draft</SubmitButton>
+                </form>
+                <ConfirmActionForm
+                  action={rotatePollAccessAction}
+                  confirmMessage="Every earlier referral link and existing poll-access grant will stop working."
+                  confirmTitle="Rotate the referral link?"
+                >
+                  <input type="hidden" name="pollId" value={poll.id} />
+                  <SubmitButton className="button button-danger w-full" pendingLabel="Rotating link…">Rotate referral link</SubmitButton>
+                </ConfirmActionForm>
+              </div>
+            </details>
+          </section>
         </aside>
       </div>
     </div>

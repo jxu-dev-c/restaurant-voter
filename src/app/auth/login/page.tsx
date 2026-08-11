@@ -34,49 +34,45 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const errorMessage = errorCode ? errorMessages[errorCode] : undefined;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-6 py-12">
-      <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
-          Restaurant Voter
-        </p>
-        <h1 className="text-3xl font-semibold tracking-tight">Admin sign in</h1>
-        <p className="text-sm leading-6 text-neutral-600">
-          Enter the configured administrator email. We will send a one-time
-          sign-in link.
-        </p>
+    <main className="admin-auth-shell">
+      <div className="w-full max-w-md">
+        <div className="brand-mark">
+          <span aria-hidden="true">LP</span>
+          <span>LunchPick</span>
+        </div>
+        <section className="admin-auth-card mt-8">
+          <p className="eyebrow">Admin access</p>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight">Sign in to manage lunch polls</h1>
+          <p className="mt-3 text-sm leading-6 text-muted">
+            Enter the authorized administrator email. We will send a secure, one-time sign-in link.
+          </p>
+
+          {errorMessage ? (
+            <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+              {errorMessage}
+            </p>
+          ) : null}
+
+          <form action={requestAdminMagicLink} className="mt-6 space-y-5">
+            <input name="next" type="hidden" value={returnPath} />
+            <div>
+              <label className="field-label" htmlFor="email">Email address</label>
+              <input
+                autoComplete="email"
+                autoFocus
+                className="field"
+                id="email"
+                inputMode="email"
+                name="email"
+                required
+                type="email"
+              />
+            </div>
+            <button className="button button-primary w-full" type="submit">Email me a sign-in link</button>
+          </form>
+        </section>
+        <p className="mt-5 text-center text-xs leading-5 text-muted">Only the configured administrator account can access this workspace.</p>
       </div>
-
-      {errorMessage ? (
-        <p
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-          role="alert"
-        >
-          {errorMessage}
-        </p>
-      ) : null}
-
-      <form action={requestAdminMagicLink} className="space-y-4">
-        <input name="next" type="hidden" value={returnPath} />
-        <label className="block space-y-2">
-          <span className="text-sm font-medium">Email address</span>
-          <input
-            autoComplete="email"
-            autoFocus
-            className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-base outline-none focus:border-neutral-900 focus:ring-2 focus:ring-neutral-200"
-            inputMode="email"
-            name="email"
-            required
-            type="email"
-          />
-        </label>
-        <button
-          className="w-full rounded-lg bg-neutral-900 px-4 py-2.5 font-medium text-white hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
-          type="submit"
-        >
-          Email me a sign-in link
-        </button>
-      </form>
     </main>
   );
 }
-
