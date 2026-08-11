@@ -142,7 +142,7 @@ select throws_ok(
     'Spam voter again'
   )$$,
   '42501',
-  'This voter was removed by the organizer',
+  'This voter entry was removed as a duplicate. To continue, open the poll in a different browser profile.',
   'removed browser cannot register again'
 );
 
