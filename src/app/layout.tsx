@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Federo, Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
+import { GitHubIcon } from "@/components/ui/icons";
 import "./globals.css";
 
 // Two display faces, split by size. Federo carries the large editorial type —
@@ -58,6 +59,15 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-canvas text-body flex flex-col">
         {children}
+        <a
+          aria-label="GitHub feedback (opens in a new tab)"
+          className="icon-button fixed right-[calc(1rem+env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 size-11 rounded-full text-ink"
+          href="https://github.com/jxu-dev-c/restaurant-voter-feedback/issues"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <GitHubIcon size={22} />
+        </a>
       </body>
     </html>
   );

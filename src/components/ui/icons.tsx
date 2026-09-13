@@ -32,6 +32,7 @@ import { ClockIcon as PhClock } from "@phosphor-icons/react/dist/ssr/Clock";
 import { CopyIcon as PhCopy } from "@phosphor-icons/react/dist/ssr/Copy";
 import { EnvelopeSimpleIcon as PhEnvelopeSimple } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
 import { ForkKnifeIcon as PhForkKnife } from "@phosphor-icons/react/dist/ssr/ForkKnife";
+import { GithubLogoIcon as PhGithubLogo } from "@phosphor-icons/react/dist/ssr/GithubLogo";
 import { HandPointingIcon as PhHandPointing } from "@phosphor-icons/react/dist/ssr/HandPointing";
 import { InfoIcon as PhInfo } from "@phosphor-icons/react/dist/ssr/Info";
 import { LinkBreakIcon as PhLinkBreak } from "@phosphor-icons/react/dist/ssr/LinkBreak";
@@ -78,6 +79,7 @@ export const PollsIcon = decorative(PhListChecks, "PollsIcon");
 export const CentersIcon = decorative(PhMapPinArea, "CentersIcon");
 export const WinnersIcon = decorative(PhTrophy, "WinnersIcon");
 export const SignOutIcon = decorative(PhSignOut, "SignOutIcon");
+export const GitHubIcon = decorative(PhGithubLogo, "GitHubIcon", { weight: "fill" });
 export const NewPollIcon = decorative(PhPlus, "NewPollIcon", { weight: "bold" });
 
 /* Poll domain -------------------------------------------------------------- */

@@ -1335,7 +1335,8 @@ textarea {
 .ballot-save-bar {
   position: sticky;
   z-index: 5;
-  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  /* Keep voting controls above the shared GitHub feedback button. */
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
   display: flex;
   flex-wrap: wrap;
   align-items: center;
