@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { AdminPollSummary } from "@/lib/domain/types";
 import { formatDate } from "@/lib/domain/format";
+import { LinkBusySwap } from "@/components/ui/link-pending";
 import {
   BallotIcon,
   CaretRightIcon,
@@ -36,9 +37,13 @@ export function PollCard({ poll }: { poll: AdminPollSummary }) {
             <dd className="admin-data-value">{formatDate(poll.createdAt)}</dd>
           </div>
         </dl>
+        {/* The detail page is server-rendered, so the caret becomes a spinner
+            in its own box while the response is in flight. */}
         <Link className="button button-secondary w-full xl:w-auto" href={`/admin/polls/${poll.id}`}>
           Manage poll
-          <CaretRightIcon size={14} />
+          <LinkBusySwap size={14}>
+            <CaretRightIcon size={14} />
+          </LinkBusySwap>
         </Link>
       </div>
     </article>

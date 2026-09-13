@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { User } from "@supabase/supabase-js";
+import { cache } from "react";
 
 import { assertAdmin, requireAdmin } from "@/lib/auth/admin";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -13,9 +14,11 @@ export type Organizer = {
   teamSlug: string;
 };
 
-async function organizerForUser(user: User): Promise<Organizer> {
-  if (!user.email) throw new Error("Organizer email is unavailable");
-  const email = user.email.toLowerCase().trim();
+/**
+ * Keyed on primitives so the layout and the page under it share one allowlist
+ * query per request instead of issuing the same join twice.
+ */
+const organizerForEmail = cache(async (userId: string, email: string): Promise<Organizer> => {
   const { data, error } = await createServiceRoleClient()
     .from("organizer_email_allowlist")
     .select("team_id,teams!inner(name,slug)")
@@ -26,12 +29,17 @@ async function organizerForUser(user: User): Promise<Organizer> {
   const team = Array.isArray(data.teams) ? data.teams[0] : data.teams;
   if (!team) throw new Error("Organizer team is unavailable");
   return {
-    id: user.id,
+    id: userId,
     email,
     teamId: data.team_id,
     teamName: team.name,
     teamSlug: team.slug,
   };
+});
+
+function organizerForUser(user: User): Promise<Organizer> {
+  if (!user.email) throw new Error("Organizer email is unavailable");
+  return organizerForEmail(user.id, user.email.toLowerCase().trim());
 }
 
 /** Resolve identity and team from server-owned data, never submitted form data. */

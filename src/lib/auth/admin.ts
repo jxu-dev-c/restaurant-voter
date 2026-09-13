@@ -2,6 +2,7 @@ import "server-only";
 
 import { isAuthError, isAuthSessionMissingError, type User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { sanitizeReturnPath } from "@/lib/auth/return-path";
 import { logServerError } from "@/lib/observability/logger";
@@ -30,7 +31,12 @@ export class AdminAuthorizationError extends Error {
   }
 }
 
-export async function getAdminUser(): Promise<User | null> {
+/**
+ * Deduped per request: the admin layout and the page beneath it both resolve
+ * the organizer, and this is a network round trip to Supabase Auth. Caching
+ * also means a failed lookup is not retried twice within one render.
+ */
+export const getAdminUser = cache(async (): Promise<User | null> => {
   const supabase = await createServerSupabaseClient();
   try {
     const {
@@ -62,7 +68,7 @@ export async function getAdminUser(): Promise<User | null> {
     });
     throw failure;
   }
-}
+});
 
 export async function assertAdmin(): Promise<User> {
   const user = await getAdminUser();

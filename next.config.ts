@@ -4,6 +4,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  experimental: {
+    // Admin routes are all dynamic, so the client cache is off by default and
+    // every hop between Polls / Lunch centers / Winner history pays a fresh
+    // server round trip. A short window makes going back to a section you just
+    // left instant; every mutation calls revalidatePath, which drops the entry,
+    // so this only ever holds data another organizer changed meanwhile.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
