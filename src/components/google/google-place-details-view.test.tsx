@@ -1,0 +1,54 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import type { GooglePlaceDetails } from "@/lib/google/types";
+
+import { GooglePlaceDetailsView } from "./google-place-details-view";
+
+const place: GooglePlaceDetails = {
+  placeId: "test-place-id",
+  displayName: "Test Restaurant",
+  formattedAddress: "123 Test Street",
+  location: null,
+  rating: 4.5,
+  userRatingCount: 100,
+  priceLevel: null,
+  photo: null,
+  businessStatus: null,
+  googleMapsUri: null,
+  types: [],
+};
+
+describe("GooglePlaceDetailsView", () => {
+  it("renders the card variant as a flat panel with no shadow", () => {
+    render(<GooglePlaceDetailsView place={place} />);
+
+    const article = screen.getByRole("article");
+    expect(article).toHaveClass("panel");
+    expect(article.className).not.toMatch(/shadow/);
+  });
+
+  it("renders the flat variant with no card wrapper, for nesting inside a selectable card", () => {
+    render(<GooglePlaceDetailsView place={place} variant="flat" />);
+
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Test Restaurant" })).toBeInTheDocument();
+    expect(screen.getByText("123 Test Street")).toBeInTheDocument();
+  });
+
+  it("renders a compact management row without card semantics", () => {
+    render(<GooglePlaceDetailsView place={place} variant="admin-row" />);
+
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.getByText("Test Restaurant")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Google Maps" })).toBeInTheDocument();
+  });
+
+  it("hides the photo fallback tile from assistive tech, since the name is already adjacent", () => {
+    render(<GooglePlaceDetailsView place={place} variant="admin-row" />);
+
+    // The tile is decorative: announcing "no photo" adds noise, not information.
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Test Restaurant" })).toBeInTheDocument();
+  });
+});

@@ -1,0 +1,14 @@
+{
+  "nrg": {
+    "name": "NRG",
+    "icon": "/team-icons/nrg.png",
+    "iconAlt": "NRG logo",
+    "source": "https://www.nrg.com/assets/static/touch-icon_152.png"
+  },
+  "jcb": {
+    "name": "JCB",
+    "icon": "/team-icons/jcb.svg",
+    "iconAlt": "JCB logo",
+    "source": "https://www.jcb.com/globalassets/logo.svg"
+  }
+}
