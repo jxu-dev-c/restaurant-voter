@@ -66,11 +66,6 @@ export default async function AdminPollPage({
     <div className="space-y-6">
       <AdminPageHeader
         actions={<CopyLinkButton value={referralUrl} />}
-        badge={
-          <span className="status-pill" data-status={poll.status}>
-            {poll.status}
-          </span>
-        }
         description={
           <>
             {poll.center.label} · Up to {poll.maxChoices} choices per voter

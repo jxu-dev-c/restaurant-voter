@@ -43,13 +43,9 @@ export function CandidateRoster({
   return (
     <section className="admin-section overflow-hidden">
       <div className="flex flex-col gap-4 border-b border-line px-5 py-5 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="eyebrow">Candidate roster</p>
-            {!canEdit ? <span className="status-pill">Locked</span> : null}
-          </div>
-          <h2 className="admin-page-title mt-2 text-2xl">{activeCount} active restaurant{activeCount === 1 ? "" : "s"}</h2>
-          <p className="mt-1 text-sm text-muted">Review the shortlist quickly and remove anything that should not reach the ballot.</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="admin-page-title text-2xl">{activeCount} active restaurant{activeCount === 1 ? "" : "s"}</h2>
+          {!canEdit ? <span className="status-pill">Locked</span> : null}
         </div>
         <div className="admin-filter-group" aria-label="Filter candidate roster">
           {filters.map((item) => (

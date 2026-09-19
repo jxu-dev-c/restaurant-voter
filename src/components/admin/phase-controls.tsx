@@ -49,7 +49,7 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
           </p>
         </div>
 
-        <div className="rounded-xs border border-line bg-surface p-5">
+        <div className="border-t border-line pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5">
           {readiness.nextStatus ? (
             <>
               <p className="admin-data-label">Next recommended action</p>
