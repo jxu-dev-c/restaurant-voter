@@ -59,7 +59,7 @@ export function googleMapsPlaceUrl(placeId: string): string {
 // Intersect weekly periods with Monday in the restaurant's local time.
 // Include Sunday overnight hours and periods that wrap across the week.
 export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefined): string {
-  if (!periods) return "Monday: Hours unavailable";
+  if (!periods) return "Hours unavailable";
   const dayMinutes = 24 * 60;
   const weekMinutes = 7 * dayMinutes;
   const minuteOfWeek = (point: OpeningHoursPeriod["open"]) =>
@@ -67,7 +67,7 @@ export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefin
   const intervals: [number, number][] = [];
 
   for (const period of periods) {
-    if (!period.close) return "Monday: Open 24 hours";
+    if (!period.close) return "Open 24 hours";
     const start = minuteOfWeek(period.open);
     let end = minuteOfWeek(period.close);
     if (end <= start) end += weekMinutes;
@@ -85,9 +85,9 @@ export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefin
     if (previous && interval[0] <= previous[1]) previous[1] = Math.max(previous[1], interval[1]);
     else merged.push([...interval]);
   }
-  if (!merged.length) return "Monday: Closed";
+  if (!merged.length) return "Closed";
   if (merged.length === 1 && merged[0][0] === 0 && merged[0][1] === dayMinutes) {
-    return "Monday: Open 24 hours";
+    return "Open 24 hours";
   }
   const time = (minutes: number) => {
     if (minutes === dayMinutes) return "midnight";
@@ -95,5 +95,5 @@ export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefin
     const minute = minutes % 60;
     return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""} ${hour < 12 ? "AM" : "PM"}`;
   };
-  return `Monday: ${merged.map(([from, to]) => `${time(from)}–${time(to)}`).join(", ")}`;
+  return `${merged.map(([from, to]) => `${time(from)}–${time(to)}`).join(", ")}`;
 }

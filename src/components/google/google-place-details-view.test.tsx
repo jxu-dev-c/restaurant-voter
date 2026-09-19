@@ -29,7 +29,7 @@ describe("GooglePlaceDetailsView", () => {
         close: { day: 1, hour: 21, minute: 0 },
       }],
     }} />);
-    expect(screen.getByText("Monday: 11 AM–9 PM")).toBeInTheDocument();
+    expect(screen.getByText("11 AM–9 PM")).toBeInTheDocument();
     expect(screen.queryByText("Operational")).not.toBeInTheDocument();
   });
 

@@ -12,17 +12,17 @@ describe("Monday hours", () => {
     const rest = mapRestPlace({ id: "test", regularOpeningHours: { periods } });
     expect(browser.openingPeriods).toEqual(periods);
     expect(rest?.openingPeriods).toEqual(periods);
-    expect(formatMondayHours(browser.openingPeriods)).toBe("Monday: 11:30 AM–2 PM, 5 PM–10 PM");
+    expect(formatMondayHours(browser.openingPeriods)).toBe("11:30 AM–2 PM, 5 PM–10 PM");
   });
   it("distinguishes missing hours, closed Mondays, and 24-hour opening", () => {
-    expect(formatMondayHours(null)).toBe("Monday: Hours unavailable");
-    expect(formatMondayHours([])).toBe("Monday: Closed");
-    expect(formatMondayHours([{ open: { day: 0, hour: 0, minute: 0 } }])).toBe("Monday: Open 24 hours");
+    expect(formatMondayHours(null)).toBe("Hours unavailable");
+    expect(formatMondayHours([])).toBe("Closed");
+    expect(formatMondayHours([{ open: { day: 0, hour: 0, minute: 0 } }])).toBe("Open 24 hours");
   });
   it("includes Sunday overnight hours and clips Monday at midnight", () => {
     expect(formatMondayHours([
       { open: { day: 0, hour: 22, minute: 0 }, close: { day: 1, hour: 2, minute: 0 } },
       { open: { day: 1, hour: 18, minute: 0 }, close: { day: 2, hour: 1, minute: 0 } },
-    ])).toBe("Monday: 12 AM–2 AM, 6 PM–midnight");
+    ])).toBe("12 AM–2 AM, 6 PM–midnight");
   });
 });
