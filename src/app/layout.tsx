@@ -60,9 +60,9 @@ export default function RootLayout({
       <body className="min-h-full bg-canvas text-body flex flex-col">
         {children}
         <a
-          aria-label="GitHub feedback (opens in a new tab)"
+          aria-label="GitHub repository (opens in a new tab)"
           className="icon-button feedback-link size-11 shrink-0 self-end rounded-full text-ink"
-          href="https://github.com/jxu-dev-c/restaurant-voter-feedback/issues"
+          href="https://github.com/jxu-dev-c/restaurant-voter"
           rel="noopener noreferrer"
           target="_blank"
         >
