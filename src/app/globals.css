@@ -914,6 +914,11 @@ textarea {
    Dialogs — one shell, was duplicated verbatim across three components
    --------------------------------------------------------------------------- */
 
+html:has(.restaurant-map-dialog:modal),
+body:has(.restaurant-map-dialog:modal) {
+  overflow: hidden;
+}
+
 .dialog-shell {
   margin: auto;
   width: calc(100% - 2rem);

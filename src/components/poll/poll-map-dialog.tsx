@@ -44,7 +44,7 @@ export function PollMapDialog({
       </button>
       <dialog
         aria-labelledby="poll-map-title"
-        className="dialog-shell max-h-[calc(100dvh-2rem)] max-w-[1000px] overflow-y-auto"
+        className="dialog-shell restaurant-map-dialog max-h-[calc(100dvh-2rem)] max-w-[1000px] overflow-y-auto overscroll-contain"
         ref={dialogRef}
         onClick={(event) => {
           if (event.target === event.currentTarget) closeDialog();
