@@ -126,6 +126,16 @@ The omitted `team_id` defaults to NRG. For another team, create its `public.team
 
 `ADMIN_EMAIL` is no longer used. Keep email signups and confirmation enabled because the allowlist hooks enforce admission, configure the allowed callback URLs, and configure production SMTP for sign-in emails. Team membership is administered directly through the allowlist and is never selected by an organizer.
 
+Configure the hosted **Magic link or OTP** and **Confirm sign up** email bodies
+using `supabase/templates/magic-link.html` and `supabase/templates/confirmation.html`.
+These templates link to `/auth/confirm` with the token hash. Opening that page
+does not redeem the token; the organizer must submit its confirmation button.
+This prevents ordinary email security link scans from consuming the one-time
+credential before the organizer clicks it. Deploy the confirmation page before
+updating hosted templates. Local template configuration does not update hosted
+templates automatically. Existing emails using Supabase's direct verification
+URL need to be replaced by a newly requested email.
+
 ## Google data handling
 
 The database stores Google Place IDs, plus an optional label authored outside Google data. Names, addresses, ratings, prices, photos, business status, and source links are fetched live. Browser place requests share an in-memory promise cache, while route matrices use one server-controlled origin and up to 50 server-loaded destination Place IDs with `DRIVE` and `TRAFFIC_UNAWARE`.

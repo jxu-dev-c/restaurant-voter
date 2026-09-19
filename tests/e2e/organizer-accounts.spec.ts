@@ -54,6 +54,10 @@ test("organizers on the same team can view and manage each other's polls", async
       const page = await context.newPage();
       // Exercise the actual callback, verified session cookie, and organizer layout.
       await page.goto(`${baseURL}/auth/callback?token_hash=${data.properties!.hashed_token}&type=${data.properties!.verification_type}`);
+      // Repeated scanner-style visits must leave the one-time token usable.
+      await expect(page.getByRole("button", { name: "Continue to LunchPick" })).toBeVisible();
+      await page.reload();
+      await page.getByRole("button", { name: "Continue to LunchPick" }).click();
       await expect(page.getByRole("heading", { name: "Lunch polls", exact: true })).toBeVisible();
       const teamIdentity = device.isMobile
         ? page.locator(".admin-mobile-team")
