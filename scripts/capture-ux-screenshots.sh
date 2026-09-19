@@ -134,12 +134,13 @@ fi
 
 echo "Capturing desktop and mobile screens..."
 {
-  node - "$ux_base_url" "$ux_output_dir" "$ux_sign_in_path" <<'NODE'
-const [baseUrl, outputDir, signInPath] = process.argv.slice(2);
+  node - "$ux_base_url" "$ux_output_dir" "$ux_sign_in_path" "${UX_SCREENSHOT_TASK_SPACE_ID:-}" <<'NODE'
+const [baseUrl, outputDir, signInPath, taskSpaceId] = process.argv.slice(2);
 for (const [name, value] of [
   ["UX_SCREENSHOT_BASE_URL", baseUrl],
   ["UX_SCREENSHOT_OUTPUT_DIR", outputDir],
   ["UX_SCREENSHOT_SIGN_IN_PATH", signInPath],
+  ["UX_SCREENSHOT_TASK_SPACE_ID", taskSpaceId],
 ]) {
   process.stdout.write(`process.env.${name} = ${JSON.stringify(value)};\n`);
 }

@@ -20,7 +20,11 @@ const devices = {
   mobile: { height: 844, mobile: true, name: "mobile", width: 390 },
 };
 const expectedPaths = [];
-const task = await taskSpace("LunchPick reproducible UX screenshots");
+const task = await taskSpace(
+  process.env.UX_SCREENSHOT_TASK_SPACE_ID
+    ? Number(process.env.UX_SCREENSHOT_TASK_SPACE_ID)
+    : "LunchPick reproducible UX screenshots",
+);
 const page = task.page("p1");
 
 console.log(`Browser task space: ${task.spaceId}`);
@@ -164,7 +168,7 @@ await capturePair("19-public-nominations-join");
 await setViewport(devices.desktop);
 await page.fill('loc=css:input[name="displayName"]', "Alex Morgan");
 await page.click('loc=css:form button[type="submit"]', { label: "join nomination poll" });
-await page.waitForSelector("text=Current shortlist", { timeout: 10_000 });
+await page.waitForSelector('loc=role:heading[name*="restaurants nominated"]', { timeout: 10_000 });
 await capturePair("20-public-nominations-participant");
 
 await grantPollAccess("22000000-0000-4000-8000-000000000001", "ux-voting-poll");
@@ -174,7 +178,7 @@ await capturePair("21-public-voting-join");
 await setViewport(devices.desktop);
 await page.fill('loc=css:input[name="displayName"]', "Chris Bennett");
 await page.click('loc=css:form button[type="submit"]', { label: "join voting poll" });
-await page.waitForSelector("text=Choose up to 3", { timeout: 10_000 });
+await page.waitForSelector('loc=role:heading[name="Choose up to 3"]', { timeout: 10_000 });
 await capturePair("22-public-voting-participant");
 
 for (const { id, name, publicId } of [
