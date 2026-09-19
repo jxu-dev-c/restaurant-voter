@@ -1,3 +1,5 @@
+import type { OpeningHoursPeriod } from "./types";
+
 const PRICE_LEVELS: Record<string, string> = {
   FREE: "Free",
   PRICE_LEVEL_FREE: "Free",
@@ -52,4 +54,46 @@ export function googleMapsPlaceUrl(placeId: string): string {
     query_place_id: placeId,
   });
   return `https://www.google.com/maps/search/?${query.toString()}`;
+}
+
+// Intersect weekly periods with Monday in the restaurant's local time.
+// Include Sunday overnight hours and periods that wrap across the week.
+export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefined): string {
+  if (!periods) return "Monday: Hours unavailable";
+  const dayMinutes = 24 * 60;
+  const weekMinutes = 7 * dayMinutes;
+  const minuteOfWeek = (point: OpeningHoursPeriod["open"]) =>
+    point.day * dayMinutes + point.hour * 60 + point.minute;
+  const intervals: [number, number][] = [];
+
+  for (const period of periods) {
+    if (!period.close) return "Monday: Open 24 hours";
+    const start = minuteOfWeek(period.open);
+    let end = minuteOfWeek(period.close);
+    if (end <= start) end += weekMinutes;
+    for (const offset of [-weekMinutes, 0, weekMinutes]) {
+      const from = Math.max(start + offset, dayMinutes);
+      const to = Math.min(end + offset, 2 * dayMinutes);
+      if (from < to) intervals.push([from - dayMinutes, to - dayMinutes]);
+    }
+  }
+
+  intervals.sort((a, b) => a[0] - b[0]);
+  const merged: [number, number][] = [];
+  for (const interval of intervals) {
+    const previous = merged.at(-1);
+    if (previous && interval[0] <= previous[1]) previous[1] = Math.max(previous[1], interval[1]);
+    else merged.push([...interval]);
+  }
+  if (!merged.length) return "Monday: Closed";
+  if (merged.length === 1 && merged[0][0] === 0 && merged[0][1] === dayMinutes) {
+    return "Monday: Open 24 hours";
+  }
+  const time = (minutes: number) => {
+    if (minutes === dayMinutes) return "midnight";
+    const hour = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+    return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""} ${hour < 12 ? "AM" : "PM"}`;
+  };
+  return `Monday: ${merged.map(([from, to]) => `${time(from)}–${time(to)}`).join(", ")}`;
 }

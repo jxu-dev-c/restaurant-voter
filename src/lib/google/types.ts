@@ -1,3 +1,8 @@
+export type OpeningHoursPeriod = {
+  open: { day: number; hour: number; minute: number };
+  close?: { day: number; hour: number; minute: number };
+};
+
 export type LatLngLiteral = {
   lat: number;
   lng: number;
@@ -31,6 +36,7 @@ export type GooglePlaceDetails = {
   priceLevel: string | null;
   photo: GooglePlacePhoto | null;
   businessStatus: string | null;
+  openingPeriods?: OpeningHoursPeriod[] | null;
   googleMapsUri: string | null;
   types: string[];
 };

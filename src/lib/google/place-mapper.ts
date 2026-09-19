@@ -3,6 +3,7 @@ import type {
   GooglePlaceDetails,
   GooglePlacePhoto,
   LatLngLiteral,
+  OpeningHoursPeriod,
 } from "./types";
 
 type BrowserLatLngLike =
@@ -32,6 +33,7 @@ export type BrowserPlaceLike = {
   userRatingCount?: number | null;
   priceLevel?: string | null;
   photos?: BrowserPhotoLike[] | null;
+  regularOpeningHours?: { periods?: OpeningHoursPeriod[] | null } | null;
   businessStatus?: string | null;
   googleMapsURI?: string | null;
   types?: string[] | null;
@@ -59,6 +61,7 @@ export type RestPlaceDetailsResponse = {
   userRatingCount?: number;
   priceLevel?: string;
   photos?: RestPhoto[];
+  regularOpeningHours?: { periods?: OpeningHoursPeriod[] | null } | null;
   businessStatus?: string;
   googleMapsUri?: string;
   types?: string[];
@@ -132,6 +135,7 @@ export function mapBrowserPlace(
     priceLevel: optionalText(place.priceLevel),
     photo: mapBrowserPhoto(place.photos?.[0], options.maxPhotoWidth ?? 960),
     businessStatus: optionalText(place.businessStatus),
+    openingPeriods: place.regularOpeningHours?.periods ?? null,
     googleMapsUri: optionalText(place.googleMapsURI),
     types: (place.types ?? []).filter(
       (value): value is string => typeof value === "string",
@@ -180,6 +184,7 @@ export function mapRestPlace(
         }
       : null,
     businessStatus: optionalText(response.businessStatus),
+    openingPeriods: response.regularOpeningHours?.periods ?? null,
     googleMapsUri: optionalText(response.googleMapsUri),
     types: (response.types ?? []).filter(
       (value): value is string => typeof value === "string",

@@ -55,6 +55,7 @@ describe("mapBrowserPlace", () => {
         ],
       },
       businessStatus: "OPERATIONAL",
+      openingPeriods: null,
       googleMapsUri: "https://maps.google.com/example",
       types: ["restaurant", "food"],
     });

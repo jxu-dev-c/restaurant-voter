@@ -3,7 +3,7 @@
 import Image, { type ImageLoaderProps } from "next/image";
 
 import {
-  formatBusinessStatus,
+  formatMondayHours,
   formatPriceLevel,
   googleMapsPlaceUrl,
 } from "@/lib/google/formatters";
@@ -84,7 +84,7 @@ export function GooglePlaceDetailsView({
           <span aria-hidden="true"> · </span>
           <span>{formatPriceLevel(place.priceLevel)}</span>
           <span aria-hidden="true"> · </span>
-          <span>{formatBusinessStatus(place.businessStatus)}</span>
+          <span>{formatMondayHours(place.openingPeriods)}</span>
         </p>
       </div>
     );
@@ -128,9 +128,9 @@ export function GooglePlaceDetailsView({
               </dd>
             </div>
             <div>
-              <dt className="sr-only">Status</dt>
+              <dt className="sr-only">Hours</dt>
               <dd className="text-muted">
-                {formatBusinessStatus(place.businessStatus)}
+                {formatMondayHours(place.openingPeriods)}
               </dd>
             </div>
           </dl>
@@ -178,7 +178,7 @@ export function GooglePlaceDetailsView({
           </p>
         </div>
 
-        <dl className="grid grid-cols-3 gap-3 text-sm">
+        <dl className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
           <div>
             <dt className="text-muted">Rating</dt>
             <dd className="font-medium text-ink">{rating}</dd>
@@ -190,9 +190,9 @@ export function GooglePlaceDetailsView({
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Status</dt>
+            <dt className="text-muted">Hours</dt>
             <dd className="font-medium text-ink">
-              {formatBusinessStatus(place.businessStatus)}
+              {formatMondayHours(place.openingPeriods)}
             </dd>
           </div>
         </dl>

@@ -9,6 +9,7 @@ export const BROWSER_PLACE_FIELDS = [
   "priceLevel",
   "photos",
   "businessStatus",
+  "regularOpeningHours",
   "googleMapsURI",
   "types",
 ] as const;
@@ -32,6 +33,7 @@ export const SERVER_PLACE_FIELD_MASK = [
   "photos.authorAttributions.photoUri",
   "photos.googleMapsUri",
   "businessStatus",
+  "regularOpeningHours",
   "googleMapsUri",
   "types",
 ].join(",");
