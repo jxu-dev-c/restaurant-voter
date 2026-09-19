@@ -77,10 +77,16 @@ export function GooglePlaceDetailsView({
           {place.formattedAddress ?? "Address unavailable"}
         </p>
         <p className="mt-2 text-sm text-muted">
-          <span className="inline-flex items-center gap-1 text-ink">
+          <a
+            className="inline-flex items-center gap-1 text-ink underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:decoration-current"
+            href={place.googleReviewsUri ?? mapsUri}
+            aria-label={`${rating} — Google reviews for ${name} (opens in a new tab)`}
+            rel="noreferrer"
+            target="_blank"
+          >
             <RatingIcon className="text-gold" size={13} />
             {rating}
-          </span>
+          </a>
           <span aria-hidden="true"> · </span>
           <span>{formatPriceLevel(place.priceLevel)}</span>
           <span aria-hidden="true"> · </span>

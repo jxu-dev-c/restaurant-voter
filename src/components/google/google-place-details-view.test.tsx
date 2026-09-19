@@ -33,6 +33,24 @@ describe("GooglePlaceDetailsView", () => {
     expect(screen.queryByText("Operational")).not.toBeInTheDocument();
   });
 
+  it("links the flat card rating to Google reviews in a new tab", () => {
+    render(<GooglePlaceDetailsView variant="flat" place={{
+      ...place, googleReviewsUri: "https://www.google.com/maps/reviews",
+    }} />);
+    const link = screen.getByRole("link", { name: /4.5 \(100\).*Google reviews for Test Restaurant/ });
+    expect(link).toHaveAttribute("href", "https://www.google.com/maps/reviews");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveClass("hover:decoration-current", "focus-visible:decoration-current");
+  });
+
+  it("falls back to the place listing when Google provides no reviews URL", () => {
+    render(<GooglePlaceDetailsView variant="flat" place={{
+      ...place, googleMapsUri: "https://www.google.com/maps/place/test",
+    }} />);
+    expect(screen.getByRole("link", { name: /Google reviews/ }))
+      .toHaveAttribute("href", "https://www.google.com/maps/place/test");
+  });
+
   it("renders the card variant as a flat panel with no shadow", () => {
     render(<GooglePlaceDetailsView place={place} />);
 

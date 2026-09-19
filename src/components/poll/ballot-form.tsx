@@ -163,10 +163,17 @@ export function BallotForm({
               const hasMetrics =
                 metric?.distanceMeters != null || metric?.durationSeconds != null;
 
-              // The whole card is the control: a <label> wrapping a visually
-              // hidden checkbox, so click, tab and space all work natively.
+              // Keep links independent of selection; the checkbox remains the
+              // native keyboard control and the rest of the card is clickable.
               return (
-                <label key={candidate.id} className="select-card">
+                <article
+                  key={candidate.id}
+                  className="select-card"
+                  onClick={(event) => {
+                    if ((event.target as Element).closest("a, input")) return;
+                    if (!disabled) toggle(candidate.id);
+                  }}
+                >
                   <input
                     type="checkbox"
                     aria-label={`Select ${candidate.fallbackLabel}`}
@@ -202,7 +209,7 @@ export function BallotForm({
                       Won {formatDate(candidate.previousWinnerAt)}
                     </p>
                   ) : null}
-                </label>
+                </article>
               );
             })}
           </div>
@@ -228,11 +235,6 @@ export function BallotForm({
         ) : null}
         {routeError ? <p className="mt-3 text-sm text-warning" role="status">{routeError}</p> : null}
         <div className="ballot-save-bar">
-          <span className="text-sm text-muted">
-            {selectedCount === 0
-              ? "Choose at least one restaurant to save."
-              : "Saving replaces your previous choices."}
-          </span>
           <SubmitButton disabled={selectedCount === 0} pendingLabel="Saving ballot…">
             Save ballot
           </SubmitButton>

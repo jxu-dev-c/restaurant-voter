@@ -4,15 +4,20 @@ import { describe, expect, it, vi } from "vitest";
 
 import { BallotForm } from "./ballot-form";
 
-// The real "flat" variant renders no interactive children — that is precisely
-// what makes wrapping the whole card in a <label> safe. This mock matches it.
-vi.mock("@/components/google", () => ({
-  GooglePlaceDetailsCard: ({ fallbackLabel }: { fallbackLabel: string }) => (
-    <div>
-      <span>{fallbackLabel}</span>
-    </div>
-  ),
-}));
+// Keep the real card content so review-link clicks exercise label behavior.
+vi.mock("@/components/google", async () => {
+  const { GooglePlaceDetailsView } = await import("@/components/google/google-place-details-view");
+  return {
+    GooglePlaceDetailsCard: ({ fallbackLabel }: { fallbackLabel: string }) => (
+      <GooglePlaceDetailsView variant="flat" place={{
+        placeId: "place-id", displayName: fallbackLabel, formattedAddress: null,
+        location: null, rating: 4.5, userRatingCount: 100, priceLevel: null,
+        photo: null, businessStatus: null, googleMapsUri: null, types: [],
+        googleReviewsUri: "https://www.google.com/maps/reviews",
+      }} />
+    ),
+  };
+});
 
 vi.mock("./use-route-metrics", () => ({
   useRouteMetrics: () => ({ metrics: new Map(), error: null }),
@@ -126,10 +131,9 @@ describe("BallotForm", () => {
     expect(checkbox).toBeChecked();
   });
 
-  it("keeps the selectable card free of nested interactive elements", () => {
-    // The whole card is a <label>, so any nested control would steal or
-    // double-fire its click. This invariant is what keeps that pattern safe.
-    const { container } = render(
+  it("opens reviews without changing the vote selection", async () => {
+    const user = userEvent.setup();
+    render(
       <BallotForm
         pollId="poll-id"
         publicId="public-id"
@@ -149,10 +153,16 @@ describe("BallotForm", () => {
       />,
     );
 
-    const card = container.querySelector("label.select-card");
-    expect(card).not.toBeNull();
-    expect(
-      card!.querySelectorAll("a, button, select, textarea, [role='button']"),
-    ).toHaveLength(0);
+    const checkbox = screen.getByRole("checkbox", { name: "Select Test Restaurant" });
+    const reviews = screen.getByRole("link", { name: /Google reviews for Test Restaurant/ });
+    await user.click(reviews);
+    expect(checkbox).not.toBeChecked();
+    await user.click(screen.getByText("Test Restaurant"));
+    expect(checkbox).toBeChecked();
+    await user.click(reviews);
+    expect(checkbox).toBeChecked();
+    reviews.focus();
+    await user.keyboard("[Enter]");
+    expect(checkbox).toBeChecked();
   });
 });

@@ -14,6 +14,7 @@ describe("mapBrowserPlace", () => {
       priceLevel: "MODERATE",
       businessStatus: "OPERATIONAL",
       googleMapsURI: "https://maps.google.com/example",
+      googleMapsLinks: { reviewsURI: "https://maps.google.com/example/reviews" },
       types: ["restaurant", "food"],
       photos: [
         {
@@ -57,6 +58,7 @@ describe("mapBrowserPlace", () => {
       businessStatus: "OPERATIONAL",
       openingPeriods: null,
       googleMapsUri: "https://maps.google.com/example",
+      googleReviewsUri: "https://maps.google.com/example/reviews",
       types: ["restaurant", "food"],
     });
   });

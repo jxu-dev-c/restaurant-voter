@@ -37,6 +37,7 @@ export type BrowserPlaceLike = {
   businessStatus?: string | null;
   googleMapsURI?: string | null;
   types?: string[] | null;
+  googleMapsLinks?: { reviewsURI?: string | null } | null;
 };
 
 type RestAttribution = {
@@ -137,6 +138,7 @@ export function mapBrowserPlace(
     businessStatus: optionalText(place.businessStatus),
     openingPeriods: place.regularOpeningHours?.periods ?? null,
     googleMapsUri: optionalText(place.googleMapsURI),
+    googleReviewsUri: optionalText(place.googleMapsLinks?.reviewsURI),
     types: (place.types ?? []).filter(
       (value): value is string => typeof value === "string",
     ),

@@ -39,6 +39,7 @@ export type GooglePlaceDetails = {
   openingPeriods?: OpeningHoursPeriod[] | null;
   googleMapsUri: string | null;
   types: string[];
+  googleReviewsUri?: string | null;
 };
 
 export type GoogleApiErrorCode =

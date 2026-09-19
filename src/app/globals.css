@@ -1363,13 +1363,13 @@ body:has(.restaurant-map-dialog:modal) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 0.75rem 1.5rem;
   margin-top: 1.5rem;
-  border: 1px solid var(--line-strong);
-  background: var(--canvas);
+  border: 0;
+  background: transparent;
   padding: 1rem;
-  box-shadow: var(--shadow-pop);
+  box-shadow: none;
 }
 
 .result-winner {

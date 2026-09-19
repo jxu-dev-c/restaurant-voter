@@ -11,6 +11,7 @@ export const BROWSER_PLACE_FIELDS = [
   "businessStatus",
   "regularOpeningHours",
   "googleMapsURI",
+  "googleMapsLinks",
   "types",
 ] as const;
 
