@@ -114,7 +114,7 @@ export default async function AdminPollPage({
           {canEditCandidates ? (
             <section className="admin-section">
               <div className="flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
-                <h2 className="card-title">Add a restaurant</h2>
+                <h2 className="card-title">Add a starting choice</h2>
                 <span className="text-sm text-muted">Search Google Maps</span>
               </div>
               <div className="border-t border-line">

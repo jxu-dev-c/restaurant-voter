@@ -20,11 +20,7 @@ export function AdminCandidateForm({
 
   return (
     <form action={action} className={embedded ? "p-5 sm:p-6" : "panel p-5"}>
-      <h2 className="font-bold">Add an admin candidate</h2>
-      <p className="mt-1 text-sm leading-6 text-muted">Candidates can be changed only before voting starts.</p>
-      <div className="mt-4">
-        <PlaceAutocompleteSearch center={center} onPlaceSelect={setPlace} />
-      </div>
+      <PlaceAutocompleteSearch center={center} onPlaceSelect={setPlace} />
       <input type="hidden" name="pollId" value={pollId} />
       <input type="hidden" name="placeId" value={place?.placeId ?? ""} />
       <div className="mt-4">
