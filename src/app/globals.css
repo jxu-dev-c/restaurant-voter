@@ -715,6 +715,10 @@ textarea {
       control. Sizing stays Google's: the icon and clear buttons are a hard
       48px, which is why the height is 3.125rem rather than .field's 2.9rem. */
 
+.feedback-link {
+  margin: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) 1rem;
+}
+
 .place-search {
   min-width: 0;
 }
@@ -762,6 +766,16 @@ textarea {
 }
 
 .place-search gmp-place-autocomplete::part(prediction-list) {
+  position: fixed;
+  inset: auto;
+  top: var(--prediction-top);
+  left: var(--prediction-left);
+  width: var(--prediction-width);
+  max-height: var(--prediction-height);
+  transform: translateY(var(--prediction-shift));
+  overflow-y: auto;
+  box-sizing: border-box;
+  z-index: 50;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-pop);
@@ -1337,8 +1351,7 @@ textarea {
 .ballot-save-bar {
   position: sticky;
   z-index: 5;
-  /* Keep voting controls above the shared GitHub feedback button. */
-  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -57,6 +57,41 @@ export function PlaceAutocompleteSearch({
   const countryCodeKey = countryCodes?.join(",") ?? "";
 
   useEffect(() => {
+    const field = containerRef.current;
+    if (!field) return;
+    const viewport = window.visualViewport;
+    const update = () => {
+      const rect = field.getBoundingClientRect();
+      const top = viewport?.offsetTop ?? 0;
+      const bottom = top + (viewport?.height ?? window.innerHeight);
+      const above = Math.max(0, rect.top - top - 8);
+      const below = Math.max(0, bottom - rect.bottom - 8);
+      const upward = below < 320 && above > below;
+      field.style.setProperty("--prediction-top", `${upward ? rect.top - 4 : rect.bottom + 4}px`);
+      field.style.setProperty("--prediction-left", `${rect.left}px`);
+      field.style.setProperty("--prediction-width", `${rect.width}px`);
+      field.style.setProperty("--prediction-height", `${Math.min(320, upward ? above : below)}px`);
+      field.style.setProperty("--prediction-shift", upward ? "-100%" : "0%");
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(field);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    field.addEventListener("focusin", update);
+    viewport?.addEventListener("resize", update);
+    viewport?.addEventListener("scroll", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+      field.removeEventListener("focusin", update);
+      viewport?.removeEventListener("resize", update);
+      viewport?.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  useEffect(() => {
     onPlaceSelectRef.current = onPlaceSelect;
   }, [onPlaceSelect]);
 

@@ -61,7 +61,7 @@ export default function RootLayout({
         {children}
         <a
           aria-label="GitHub feedback (opens in a new tab)"
-          className="icon-button fixed right-[calc(1rem+env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 size-11 rounded-full text-ink"
+          className="icon-button feedback-link size-11 shrink-0 self-end rounded-full text-ink"
           href="https://github.com/jxu-dev-c/restaurant-voter-feedback/issues"
           rel="noopener noreferrer"
           target="_blank"
