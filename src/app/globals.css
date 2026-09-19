@@ -716,7 +716,10 @@ textarea {
       48px, which is why the height is 3.125rem rather than .field's 2.9rem. */
 
 .feedback-link {
-  margin: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) 1rem;
+  position: fixed;
+  right: calc(1rem + env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 60;
 }
 
 .place-search {
@@ -1351,7 +1354,7 @@ textarea {
 .ballot-save-bar {
   position: sticky;
   z-index: 5;
-  bottom: calc(1rem + env(safe-area-inset-bottom));
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
   display: flex;
   flex-wrap: wrap;
   align-items: center;
