@@ -129,7 +129,28 @@ async function verifyScreenshots() {
   }
 }
 
-await navigate(signInPath, "text=Lunch polls");
+// /auth/callback deliberately refuses to redeem an emailed token on a GET — it
+// hands the parameters to /auth/confirm, whose form POST performs the exchange,
+// so an email security scanner cannot burn the one-time credential. Submit that
+// form the way an organizer would.
+//
+// The button is matched by text rather than by role and name: .button uppercases
+// its label, so its accessible name is "CONTINUE TO LUNCHPICK".
+//
+// Assert on the dashboard's own heading afterwards. "text=Lunch polls" also
+// matches the sign-in page's "Sign in to manage lunch polls", so a failed
+// sign-in used to pass that check and every admin screen below was silently
+// captured as the login form.
+await setViewport(devices.desktop);
+await page.goto(new URL(signInPath, baseUrl).toString());
+await page.waitForSelector("text=Continue to LunchPick", { timeout: 10_000 });
+await page.click('loc=css:form button[type="submit"]', {
+  label: "confirm organizer sign-in",
+});
+await page.waitForSelector('loc=role:heading[name="Lunch polls"]', {
+  timeout: 10_000,
+});
+await page.waitForSelector("loc=css:.admin-sidebar", { timeout: 10_000 });
 
 for (const [name, route] of [
   ["01-home", "/"],
