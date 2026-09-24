@@ -11,7 +11,6 @@ export default async function LunchCentersPage() {
     <div>
       <AdminPageHeader
         description="Centers keep restaurant discovery anchored around a familiar office or meetup point. Existing polls retain the coordinates they started with."
-        eyebrow="Reusable settings"
         title="Lunch centers"
       />
       <div className="layout-rail mt-8">
@@ -24,14 +23,11 @@ export default async function LunchCentersPage() {
             <div className="divide-y divide-line">
               {centers.map((center) => (
                 <article className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6" key={center.id}>
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-3">
                     <span className="state-icon h-9 w-9">
                       <PlaceIcon size={17} />
                     </span>
-                    <div>
-                      <h3 className="font-bold">{center.label}</h3>
-                      <p className="mt-1 text-sm text-muted">Lunch search origin</p>
-                    </div>
+                    <h3 className="font-bold">{center.label}</h3>
                   </div>
                   <code className="rounded-xs bg-band px-3 py-2 text-xs text-muted">{center.latitude.toFixed(5)}, {center.longitude.toFixed(5)}</code>
                 </article>

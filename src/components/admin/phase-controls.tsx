@@ -27,12 +27,7 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
     <section className="admin-lifecycle-panel">
       <div className="layout-rail gap-8">
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="title-content text-2xl">{poll.status === "closed" ? "Poll complete" : "Move the poll forward"}</h2>
-            </div>
-            <span className="status-pill" data-status={poll.status}>{poll.status}</span>
-          </div>
+          <h2 className="title-content text-2xl">{poll.status === "closed" ? "Poll complete" : "Move the poll forward"}</h2>
           <ol className="mt-6 grid gap-2 sm:grid-flow-col sm:auto-cols-fr" aria-label="Poll phases">
             {phases.map((phase, index) => {
               const state = index < currentPhaseIndex ? "complete" : index === currentPhaseIndex ? "current" : "upcoming";

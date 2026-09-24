@@ -1336,7 +1336,14 @@ body:has(.restaurant-map-dialog:modal) {
   padding: 1.5rem;
 }
 
-/* Public polls use an open masthead with spacing to establish hierarchy. */
+/* Public polls use a full-bleed oat band, so the voter-facing masthead carries
+   the same section rhythm as the landing page instead of floating on canvas.
+   Deliberately tighter than .band — this is a page header, not a content band. */
+.poll-masthead {
+  background: var(--band);
+  border-bottom: 1px solid var(--line);
+}
+
 .poll-heading {
   padding-block: 1.5rem 1.75rem;
 }
@@ -1353,6 +1360,7 @@ body:has(.restaurant-map-dialog:modal) {
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
   padding-bottom: 1rem;
 }
 
@@ -1445,6 +1453,10 @@ body:has(.restaurant-map-dialog:modal) {
 
   .admin-lifecycle-panel {
     padding: 1.75rem;
+  }
+
+  .poll-heading {
+    padding-block: 2.25rem 2.5rem;
   }
 
   .admin-auth-card {

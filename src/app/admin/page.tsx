@@ -12,7 +12,6 @@ export default async function AdminDashboardPage() {
       <AdminPageHeader
         actions={<Link className="button button-primary" href="/admin/polls/new"><NewPollIcon size={16} />New poll</Link>}
         description="See what needs attention, move polls forward safely, and keep lunch decisions on track."
-        eyebrow="Your workspace"
         title="Lunch polls"
       />
 

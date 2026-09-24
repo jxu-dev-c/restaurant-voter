@@ -65,39 +65,42 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
           )
         }
       />
-      <main className="shell py-7 sm:py-10">
-        <section className="poll-heading">
-          <div className="grid gap-7 lg:grid-cols-[1fr_390px] lg:items-end">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="status-pill" data-status={poll.status}>{poll.status}</span>
+      {/* Full-bleed oat band, matching the landing page's section rhythm — the
+          phase steps carry the poll's phase, so no status pill repeats it. */}
+      <div className="poll-masthead">
+        <div className="shell">
+          <section className="poll-heading">
+            <div className="grid gap-7 lg:grid-cols-[1fr_390px] lg:items-end">
+              <div>
+                <h1 className="admin-page-title">{poll.title}</h1>
+                <p className="mt-3 flex items-center gap-2 text-muted">
+                  {poll.status === "closed" ? (
+                    <>
+                      <DateIcon className="shrink-0" size={16} />
+                      {`Voting closed ${formatDate(poll.closedAt)}.`}
+                    </>
+                  ) : (
+                    <>
+                      <PlaceIcon className="shrink-0" size={16} />
+                      {`Driving estimates start from ${poll.center.label}.`}
+                    </>
+                  )}
+                </p>
+                {poll.currentVoter && (poll.status === "nominations" || poll.status === "voting") ? (
+                  <PollMapDialog
+                    center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
+                    centerLabel={poll.center.label}
+                    candidates={interactiveCandidates}
+                  />
+                ) : null}
               </div>
-              <h1 className="mt-4 admin-page-title">{poll.title}</h1>
-              <p className="mt-3 flex items-center gap-2 text-muted">
-                {poll.status === "closed" ? (
-                  <>
-                    <DateIcon className="shrink-0" size={16} />
-                    {`Voting closed ${formatDate(poll.closedAt)}.`}
-                  </>
-                ) : (
-                  <>
-                    <PlaceIcon className="shrink-0" size={16} />
-                    {`Driving estimates start from ${poll.center.label}.`}
-                  </>
-                )}
-              </p>
-              {poll.currentVoter && (poll.status === "nominations" || poll.status === "voting") ? (
-                <PollMapDialog
-                  center={{ lat: poll.center.latitude, lng: poll.center.longitude }}
-                  centerLabel={poll.center.label}
-                  candidates={interactiveCandidates}
-                />
-              ) : null}
+              <PhaseSteps status={poll.status} />
             </div>
-            <PhaseSteps status={poll.status} />
-          </div>
-        </section>
+          </section>
+        </div>
+      </div>
 
+      <main className="shell pb-10 sm:pb-14">
         {poll.status !== "closed" && !poll.currentVoter ? (
           <section className="mx-auto mt-7 max-w-xl">
             <JoinPollForm action={registerAction} />

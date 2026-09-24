@@ -40,8 +40,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <span>LunchPick</span>
         </div>
         <section className="admin-auth-card mt-8">
-          <p className="eyebrow">Organizer access</p>
-          <h1 className="admin-page-title mt-3">Sign in to manage lunch polls</h1>
+          <h1 className="admin-page-title">Sign in to manage lunch polls</h1>
           <p className="mt-3 text-sm leading-6 text-muted">
             Enter an authorized organizer email. We will send a secure, one-time sign-in link.
           </p>

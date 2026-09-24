@@ -14,7 +14,6 @@ export default async function WinnerHistoryPage() {
     <div>
       <AdminPageHeader
         description="Track recent winners so repeat choices are visible during future nominations without making them ineligible."
-        eyebrow="Repeat awareness"
         title="Winner history"
       />
       <div className="layout-rail mt-8">

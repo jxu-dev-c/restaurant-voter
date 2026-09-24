@@ -113,9 +113,8 @@ export default async function AdminPollPage({
 
           {canEditCandidates ? (
             <section className="admin-section">
-              <div className="flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
+              <div className="px-5 py-4 sm:px-6">
                 <h2 className="card-title">Add a starting choice</h2>
-                <span className="text-sm text-muted">Search Google Maps</span>
               </div>
               <div className="border-t border-line">
                 <AdminCandidateForm
@@ -149,8 +148,7 @@ export default async function AdminPollPage({
           />
 
           <section className="admin-section p-5">
-            <p className="eyebrow">Poll settings</p>
-            <dl className="mt-4 grid grid-cols-2 gap-4">
+            <dl className="grid grid-cols-2 gap-4">
               <div>
                 <dt className="admin-data-label">Center</dt>
                 <dd className="admin-data-value">{poll.center.label}</dd>

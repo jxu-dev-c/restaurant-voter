@@ -77,7 +77,9 @@ export function CandidateRoster({
               />
             </div>
             <div className="flex flex-wrap items-center gap-2 xl:max-w-48 xl:justify-end">
-              <span className="status-pill">{candidate.source === "admin" ? "Admin added" : "Voter nominated"}</span>
+              {candidate.source === "voter" ? (
+                <span className="status-pill">Voter nominated</span>
+              ) : null}
               {candidate.previousWinnerAt ? (
                 <span className="flag">Won {formatDate(candidate.previousWinnerAt)}</span>
               ) : null}
