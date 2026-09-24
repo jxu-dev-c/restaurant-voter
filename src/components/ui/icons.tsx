@@ -22,6 +22,7 @@ import type { Icon, IconProps } from "@phosphor-icons/react/dist/lib/types";
 import { ArrowRightIcon as PhArrowRight } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { ArrowUpRightIcon as PhArrowUpRight } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import { ArrowsClockwiseIcon as PhArrowsClockwise } from "@phosphor-icons/react/dist/ssr/ArrowsClockwise";
+import { BugIcon as PhBug } from "@phosphor-icons/react/dist/ssr/Bug";
 import { CalendarBlankIcon as PhCalendarBlank } from "@phosphor-icons/react/dist/ssr/CalendarBlank";
 import { CarSimpleIcon as PhCarSimple } from "@phosphor-icons/react/dist/ssr/CarSimple";
 import { CaretRightIcon as PhCaretRight } from "@phosphor-icons/react/dist/ssr/CaretRight";
@@ -32,7 +33,6 @@ import { ClockIcon as PhClock } from "@phosphor-icons/react/dist/ssr/Clock";
 import { CopyIcon as PhCopy } from "@phosphor-icons/react/dist/ssr/Copy";
 import { EnvelopeSimpleIcon as PhEnvelopeSimple } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
 import { ForkKnifeIcon as PhForkKnife } from "@phosphor-icons/react/dist/ssr/ForkKnife";
-import { GithubLogoIcon as PhGithubLogo } from "@phosphor-icons/react/dist/ssr/GithubLogo";
 import { HandPointingIcon as PhHandPointing } from "@phosphor-icons/react/dist/ssr/HandPointing";
 import { InfoIcon as PhInfo } from "@phosphor-icons/react/dist/ssr/Info";
 import { LinkBreakIcon as PhLinkBreak } from "@phosphor-icons/react/dist/ssr/LinkBreak";
@@ -79,7 +79,6 @@ export const PollsIcon = decorative(PhListChecks, "PollsIcon");
 export const CentersIcon = decorative(PhMapPinArea, "CentersIcon");
 export const WinnersIcon = decorative(PhTrophy, "WinnersIcon");
 export const SignOutIcon = decorative(PhSignOut, "SignOutIcon");
-export const GitHubIcon = decorative(PhGithubLogo, "GitHubIcon", { weight: "fill" });
 export const NewPollIcon = decorative(PhPlus, "NewPollIcon", { weight: "bold" });
 
 /* Poll domain -------------------------------------------------------------- */
@@ -109,6 +108,10 @@ export const CheckIcon = decorative(PhCheck, "CheckIcon", { weight: "bold" });
 export const PendingIcon = decorative(PhClock, "PendingIcon");
 export const NotFoundIcon = decorative(PhMagnifyingGlass, "NotFoundIcon");
 export const BrokenLinkIcon = decorative(PhLinkBreak, "BrokenLinkIcon");
+/** The floating report control carries no visible label, so the glyph alone has
+    to say "something is wrong here" — a bug reads that way, a repository logo
+    only said "GitHub". */
+export const ReportIssueIcon = decorative(PhBug, "ReportIssueIcon");
 
 /* Actions ------------------------------------------------------------------ */
 

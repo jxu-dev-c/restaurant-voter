@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Federo, Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
-import { GitHubIcon } from "@/components/ui/icons";
+import { ReportIssueIcon } from "@/components/ui/icons";
 import "./globals.css";
 
 // Two display faces, split by size. Federo carries the large editorial type —
@@ -59,14 +59,19 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-canvas text-body flex flex-col">
         {children}
+        {/* data-label is drawn on hover and keyboard focus; aria-label carries
+            the same wording for assistive tech, which never sees the pseudo
+            element. /issues/new/choose lands on the bug and feature templates
+            rather than the repository front page. */}
         <a
-          aria-label="GitHub repository (opens in a new tab)"
+          aria-label="Report an issue on GitHub (opens in a new tab)"
           className="icon-button feedback-link size-11 shrink-0 self-end rounded-full text-ink"
-          href="https://github.com/jxu-dev-c/restaurant-voter"
+          data-label="Report an issue"
+          href="https://github.com/jxu-dev-c/restaurant-voter/issues/new/choose"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <GitHubIcon size={22} />
+          <ReportIssueIcon size={20} />
         </a>
       </body>
     </html>

@@ -46,7 +46,7 @@ function TeamIdentity({
         </span>
       ) : null}
       <div className="min-w-0">
-        <p className="eyebrow">Team workspace</p>
+        {compact ? null : <p className="eyebrow">Team workspace</p>}
         <p className="truncate text-sm font-semibold text-ink">{displayName}</p>
       </div>
     </div>
@@ -63,13 +63,15 @@ export function AdminShell({
   return (
     <div className="admin-root min-h-screen">
       <header className="admin-mobile-header">
-        <Link href="/admin" className="brand-mark" aria-label="LunchPick admin home">
-          <span aria-hidden="true">LP</span>
-          <span>LunchPick</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          {/* No icons on this row: brand mark + both buttons already fill 390px,
-              and .button is nowrap, so any extra width overflows the viewport. */}
+        <div className="flex min-w-0 items-center gap-2.5">
+          <Link href="/admin" className="brand-mark" aria-label="LunchPick admin home">
+            <span aria-hidden="true">LP</span>
+          </Link>
+          <TeamIdentity compact name={teamName} slug={teamSlug} />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* No icons on this row: the identity and both buttons already fill
+              390px, and .button is nowrap, so any extra width overflows. */}
           <Link className="button button-primary button-compact" href="/admin/polls/new">
             New poll
           </Link>
@@ -80,10 +82,6 @@ export function AdminShell({
           </form>
         </div>
       </header>
-
-      <div className="admin-mobile-team border-b border-line bg-canvas px-4 py-2 lg:hidden">
-        <TeamIdentity compact name={teamName} slug={teamSlug} />
-      </div>
 
       <div className="admin-mobile-nav overflow-x-auto">
         <AdminNav compact />

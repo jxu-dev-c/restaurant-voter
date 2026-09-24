@@ -715,11 +715,45 @@ textarea {
       control. Sizing stays Google's: the icon and clear buttons are a hard
       48px, which is why the height is 3.125rem rather than .field's 2.9rem. */
 
+/* Floats above page content on every route, so it takes the system's one
+   shadow to separate itself from whatever it is sitting on. */
 .feedback-link {
   position: fixed;
   right: calc(1rem + env(safe-area-inset-right));
   bottom: calc(1rem + env(safe-area-inset-bottom));
   z-index: 60;
+  box-shadow: var(--shadow-pop);
+}
+
+/* The control is a glyph at rest and names itself on hover or keyboard focus.
+   It opens leftward from a button already pinned to the right edge, so the
+   label can never push itself off screen. */
+.feedback-link::after {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.5rem);
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  padding: 0.3rem 0.55rem;
+  color: var(--ink);
+  font-family: var(--font-label-stack);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  content: attr(data-label);
+}
+
+.feedback-link:hover::after,
+.feedback-link:focus-visible::after {
+  opacity: 1;
 }
 
 .place-search {
