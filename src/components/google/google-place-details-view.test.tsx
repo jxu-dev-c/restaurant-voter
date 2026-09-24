@@ -20,13 +20,13 @@ const place: GooglePlaceDetails = {
 };
 
 describe("GooglePlaceDetailsView", () => {
-  it.each(["card", "flat", "admin-row"] as const)("shows Monday hours instead of operational status in %s", (variant) => {
+  it.each(["card", "flat", "admin-row"] as const)("shows poll-day hours instead of operational status in %s", (variant) => {
     render(<GooglePlaceDetailsView variant={variant} place={{
       ...place,
       businessStatus: "OPERATIONAL",
       openingPeriods: [{
-        open: { day: 1, hour: 11, minute: 0 },
-        close: { day: 1, hour: 21, minute: 0 },
+        open: { day: 2, hour: 11, minute: 0 },
+        close: { day: 2, hour: 21, minute: 0 },
       }],
     }} />);
     expect(screen.getByText("11 AM–9 PM")).toBeInTheDocument();

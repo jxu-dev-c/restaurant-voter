@@ -56,12 +56,20 @@ export function googleMapsPlaceUrl(placeId: string): string {
   return `https://www.google.com/maps/search/?${query.toString()}`;
 }
 
-// Intersect weekly periods with Monday in the restaurant's local time.
-// Include Sunday overnight hours and periods that wrap across the week.
-export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefined): string {
+// Google numbers days from Sunday; the poll always lands on Tuesday, so hours
+// are intersected with that day in the restaurant's local time. Sunday-style
+// overnight spills and periods that wrap across the week are included.
+export const POLL_WEEKDAY = 2;
+
+export function formatPollDayHours(
+  periods: OpeningHoursPeriod[] | null | undefined,
+  weekday: number = POLL_WEEKDAY,
+): string {
   if (!periods) return "Hours unavailable";
   const dayMinutes = 24 * 60;
   const weekMinutes = 7 * dayMinutes;
+  const dayStart = weekday * dayMinutes;
+  const dayEnd = dayStart + dayMinutes;
   const minuteOfWeek = (point: OpeningHoursPeriod["open"]) =>
     point.day * dayMinutes + point.hour * 60 + point.minute;
   const intervals: [number, number][] = [];
@@ -72,9 +80,9 @@ export function formatMondayHours(periods: OpeningHoursPeriod[] | null | undefin
     let end = minuteOfWeek(period.close);
     if (end <= start) end += weekMinutes;
     for (const offset of [-weekMinutes, 0, weekMinutes]) {
-      const from = Math.max(start + offset, dayMinutes);
-      const to = Math.min(end + offset, 2 * dayMinutes);
-      if (from < to) intervals.push([from - dayMinutes, to - dayMinutes]);
+      const from = Math.max(start + offset, dayStart);
+      const to = Math.min(end + offset, dayEnd);
+      if (from < to) intervals.push([from - dayStart, to - dayStart]);
     }
   }
 

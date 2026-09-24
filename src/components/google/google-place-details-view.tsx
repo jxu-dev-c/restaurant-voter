@@ -3,7 +3,7 @@
 import Image, { type ImageLoaderProps } from "next/image";
 
 import {
-  formatMondayHours,
+  formatPollDayHours,
   formatPriceLevel,
   googleMapsPlaceUrl,
 } from "@/lib/google/formatters";
@@ -90,7 +90,7 @@ export function GooglePlaceDetailsView({
           <span aria-hidden="true"> · </span>
           <span>{formatPriceLevel(place.priceLevel)}</span>
           <span aria-hidden="true"> · </span>
-          <span>{formatMondayHours(place.openingPeriods)}</span>
+          <span>{formatPollDayHours(place.openingPeriods)}</span>
         </p>
       </div>
     );
@@ -136,7 +136,7 @@ export function GooglePlaceDetailsView({
             <div>
               <dt className="sr-only">Hours</dt>
               <dd className="text-muted">
-                {formatMondayHours(place.openingPeriods)}
+                {formatPollDayHours(place.openingPeriods)}
               </dd>
             </div>
           </dl>
@@ -198,7 +198,7 @@ export function GooglePlaceDetailsView({
           <div>
             <dt className="text-muted">Hours</dt>
             <dd className="font-medium text-ink">
-              {formatMondayHours(place.openingPeriods)}
+              {formatPollDayHours(place.openingPeriods)}
             </dd>
           </div>
         </dl>

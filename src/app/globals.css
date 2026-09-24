@@ -1414,6 +1414,38 @@ body:has(.restaurant-map-dialog:modal) {
   box-shadow: none;
 }
 
+/* The bar floats over the cards, so the button has to carry its own edge: an
+   opaque canvas ring separates it from whatever photo scrolls beneath, and a
+   blue-tinted lift marks it as the one action on the page. */
+.ballot-save-bar > .button-primary {
+  min-height: 3.25rem;
+  padding: 0.75rem 2.5rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  box-shadow:
+    0 0 0 4px var(--canvas),
+    0 10px 24px -10px rgb(0 88 189 / 55%),
+    var(--shadow-pop);
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.ballot-save-bar > .button-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 4px var(--canvas),
+    0 16px 32px -10px rgb(0 88 189 / 65%),
+    var(--shadow-pop);
+}
+
+/* Nothing selected yet: keep the ring so the button still floats cleanly, drop
+   the blue lift so it does not advertise an action that is not available. */
+.ballot-save-bar > .button-primary:disabled {
+  box-shadow: 0 0 0 4px var(--canvas), var(--shadow-pop);
+}
+
 .result-winner {
   position: relative;
   overflow: hidden;
