@@ -63,6 +63,7 @@ function assertQuery<T>(data: T | null, error: { message: string } | null, conte
 
 export type PollAccessRecord = {
   id: string;
+  teamId: string;
   publicId: string;
   status: PublicPollView["status"];
   accessVersion: number;
@@ -72,7 +73,7 @@ export const getPollAccessRecord = cache(async (publicId: string): Promise<PollA
   const supabase = createServiceRoleClient();
   const { data, error } = await supabase
     .from("polls")
-    .select("id,public_id,status,access_version")
+    .select("id,team_id,public_id,status,access_version")
     .eq("public_id", publicId)
     .maybeSingle();
 
@@ -81,6 +82,7 @@ export const getPollAccessRecord = cache(async (publicId: string): Promise<PollA
 
   return {
     id: data.id,
+    teamId: data.team_id,
     publicId: data.public_id,
     status: data.status as PollAccessRecord["status"],
     accessVersion: data.access_version,

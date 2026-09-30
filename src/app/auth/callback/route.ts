@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getPublicEnvironment } from "@/lib/env";
 import { sanitizeReturnPath } from "@/lib/auth/return-path";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { clearTrialSession } from "@/lib/trial/workspace";
 
 const acceptedOtpTypes = new Set<EmailOtpType>([
   "email",
@@ -84,6 +85,7 @@ async function redeemCredential(parameters: URLSearchParams) {
     return loginErrorResponse("unauthorized");
   }
 
+  await clearTrialSession();
   const response = NextResponse.redirect(new URL(returnTo, getPublicEnvironment().appUrl), 303);
   response.headers.set("Cache-Control", "private, no-store");
   return response;

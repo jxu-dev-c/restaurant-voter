@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { loadBrowserPlaceDetails } from "@/lib/google/browser-place";
 import { googleMapsPlaceUrl } from "@/lib/google/formatters";
+import { getTrialSamplePlace } from "@/lib/trial/sample-restaurants";
 
 export function GooglePlaceName({
   placeId,
@@ -36,6 +37,7 @@ export function GooglePlaceName({
   }, [placeId]);
 
   const currentPlace = place?.requestPlaceId === placeId ? place : null;
+  if (getTrialSamplePlace(placeId)) return <span className={className}>{currentPlace?.displayName ?? fallbackLabel}</span>;
   return (
     <a
       className={className}

@@ -600,9 +600,13 @@ select is(
   'zero-ballot poll has no official winner'
 );
 
+create temporary table retention_expected as
+select count(*)::integer as total from public.poll_voters pv join public.polls p on p.id = pv.poll_id
+where p.status = 'closed' and p.closed_at <= now() + interval '1 day' and pv.anonymized_at is null;
+
 select is(
   public.anonymize_closed_poll_voters(now() + interval '91 days'),
-  5,
+  (select total from retention_expected),
   'retention job anonymizes all voters after 90 days'
 );
 

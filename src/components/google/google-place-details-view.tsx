@@ -9,6 +9,7 @@ import {
 } from "@/lib/google/formatters";
 import type { GooglePlaceDetails } from "@/lib/google/types";
 import { ExternalLinkIcon, RatingIcon, RestaurantIcon } from "@/components/ui/icons";
+import { getTrialSamplePlace } from "@/lib/trial/sample-restaurants";
 
 export type PlaceDetailsVariant = "card" | "admin-row" | "flat";
 
@@ -50,6 +51,30 @@ export function GooglePlaceDetailsView({
             ? ""
             : ` (${place.userRatingCount.toLocaleString()})`
         }`;
+
+  if (getTrialSamplePlace(place.placeId)) {
+    const details = (
+      <div className="min-w-0">
+        <h3 className="card-title">{name}</h3>
+        <p className="mt-1 text-sm leading-6 text-muted">{place.formattedAddress}</p>
+        <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <span className="inline-flex items-center gap-1"><RatingIcon className="text-gold" size={13} />{rating}</span>
+          <span>· {formatPriceLevel(place.priceLevel)} · {formatPollDayHours(place.openingPeriods)}</span>
+        </p>
+        <p className="mt-1 text-xs text-muted">Fictional sample restaurant</p>
+      </div>
+    );
+    return variant === "admin-row" ? (
+      <div className="grid min-w-0 grid-cols-[88px_minmax(0,1fr)] items-center gap-4 sm:grid-cols-[120px_minmax(0,1fr)]">
+        <PlaceMediaFallback className="media media-empty" />{details}
+      </div>
+    ) : (
+      <div className={variant === "card" ? "panel p-4" : "min-w-0"}>
+        {!compact ? <PlaceMediaFallback /> : null}
+        <div className="mt-3">{details}</div>
+      </div>
+    );
+  }
 
   // Image-led, no container chrome — for use inside .select-card and rosters.
   if (variant === "flat") {

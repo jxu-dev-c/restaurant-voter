@@ -1,17 +1,20 @@
 import "server-only";
 
 import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 
 import { assertAdmin, requireAdmin } from "@/lib/auth/admin";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { getTrialOrganizer, TrialSessionExpiredError } from "@/lib/trial/workspace";
 
 export type Organizer = {
-  id: string;
+  id: string | null;
   email: string;
   teamId: string;
   teamName: string;
   teamSlug: string;
+  trialResetsAt?: string;
 };
 
 /**
@@ -44,12 +47,17 @@ function organizerForUser(user: User): Promise<Organizer> {
 
 /** Resolve identity and team from server-owned data, never submitted form data. */
 export async function requireOrganizer() {
-  return organizerForUser(await assertAdmin());
+  return await getTrialOrganizer() ?? organizerForUser(await assertAdmin());
 }
 
 /** Page reads redirect unauthenticated visitors while enforcing the same team lookup. */
 export async function requireOrganizerPage(options: { returnTo?: string } = {}) {
-  return organizerForUser(await requireAdmin(options));
+  try {
+    return await getTrialOrganizer() ?? organizerForUser(await requireAdmin(options));
+  } catch (error) {
+    if (error instanceof TrialSessionExpiredError) redirect("/trial/expired");
+    throw error;
+  }
 }
 
 export async function requireOwnedPoll(pollId: string) {

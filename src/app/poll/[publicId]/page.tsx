@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { TrialNotice } from "@/components/trial-notice";
 import { AutoRefresh } from "@/components/poll/auto-refresh";
 import { BallotForm } from "@/components/poll/ballot-form";
 import { CandidateGallery } from "@/components/poll/candidate-gallery";
@@ -15,6 +16,8 @@ import { getAuthorizedPoll } from "@/lib/data/access";
 import { getPublicPollView } from "@/lib/data/polls";
 import { formatDate } from "@/lib/domain/format";
 import { readPollDeviceIdentity } from "@/lib/security/poll-cookies";
+import { TRIAL_TEAM_ID } from "@/lib/trial/constants";
+import { getTrialResetDate } from "@/lib/trial/workspace";
 import {
   nominateRestaurantAction,
   registerVoterAction,
@@ -37,6 +40,7 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
   const device = await readPollDeviceIdentity(publicId);
   const poll = await getPublicPollView(publicId, device?.deviceHash);
   if (!poll) notFound();
+  const trialResetsAt = authorized.teamId === TRIAL_TEAM_ID ? await getTrialResetDate() : null;
 
   const activeCandidates = poll.candidates.filter((candidate) => candidate.status === "active");
   const interactiveCandidates = activeCandidates.map((candidate) => ({
@@ -101,6 +105,7 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
       </div>
 
       <main className="shell pb-10 sm:pb-14">
+        {trialResetsAt ? <div className="mt-7"><TrialNotice resetsAt={trialResetsAt} /></div> : null}
         {poll.status !== "closed" && !poll.currentVoter ? (
           <section className="mx-auto mt-7 max-w-xl">
             <JoinPollForm action={registerAction} />

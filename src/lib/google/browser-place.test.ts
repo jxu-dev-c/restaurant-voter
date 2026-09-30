@@ -13,6 +13,15 @@ describe("browser place details", () => {
     loadGoogleMapsLibrary.mockReset();
   });
 
+  it("loads authored trial details without Google configuration or requests", async () => {
+    const result = await loadBrowserPlaceDetails("lunchpick-trial-sample-1");
+    expect(result).toMatchObject({ ok: true, data: {
+      displayName: "Harbour Tacos", rating: 4.7,
+      formattedAddress: "12 Sample Wharf, Halifax", googleMapsUri: null,
+    } });
+    expect(loadGoogleMapsLibrary).not.toHaveBeenCalled();
+  });
+
   it("deduplicates concurrent requests for the same place and fields", async () => {
     const fetchFields = vi.fn().mockResolvedValue(undefined);
 

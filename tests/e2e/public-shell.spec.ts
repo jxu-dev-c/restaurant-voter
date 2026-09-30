@@ -15,6 +15,9 @@ test("landing and legal pages are usable", async ({ page }) => {
   for (const link of await createPollLinks.all()) {
     await expect(link).toHaveAttribute("href", "/admin/login");
   }
+  await expect(page.getByRole("button", { name: "Try as an organizer" })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole("button", { name: "Try voting", exact: true })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByText(/resets every Monday at 00:00 UTC/)).toBeVisible();
 
   await page.getByRole("link", { name: "Privacy" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Privacy at LunchPick" })).toBeVisible();

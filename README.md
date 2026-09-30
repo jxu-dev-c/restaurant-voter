@@ -101,6 +101,42 @@ Public server requests must pass a versioned HMAC referral grant and, for voter-
 
 Revision conflicts use a PostgREST HTTP-409 SQLSTATE so stale edits fail immediately rather than being retried as database serialization failures.
 
+## Public trial team
+
+The homepage offers **Try as an organizer** and **Try voting**. Both use the
+reserved `LunchPick trial` team without email setup. Organizers can create and
+manage polls and copy referral links; voters enter a display name and submit or
+edit a ballot using the usual flow. All visitors share the trial data, so use
+sample information only. The trial banner identifies the workspace and its next
+reset. Existing organizer sign-ins are preserved; **Leave trial** returns to the
+homepage, and a fresh real-account sign-in exits trial mode.
+
+Migration `202609300001_trial_workspace.sql` creates and seeds the trial team
+and schedules its reset every Monday at 00:00 UTC using the existing Supabase
+Cron extension. An entry request also repairs a missed reset after downtime.
+Sample polls cover all four lifecycle stages, fictional restaurant labels,
+sample voters and ballots, and winner history. Sample profiles, ratings, hours,
+locations, and driving estimates are authored fictional fixtures and work
+without Google API keys. They are labeled as samples and do not link to Google
+business reviews. Organizers can add real restaurants through Google search
+when API keys are configured; those use live Google data.
+
+Normal organizers cannot be assigned to the trial team. The reset has no team
+parameter: it operates only on the reserved UUID, requires
+the trial marker and slug, and refuses any team with normal organizer membership.
+It deletes only that team's workspace and dependent poll records, keeps shared
+restaurant identifiers, and reseeds in one transaction. Cleanup exceptions for
+immutable rows are limited to the locked trial poll IDs; normal teams retain
+their guards. Each reset replaces poll IDs and the session generation, revoking
+old trial links and organizer sessions. An expired trial session blocks writes
+instead of falling back to a preserved normal account. No Supabase Auth user or
+allowlist entry is created for the trial organizer.
+
+Apply the migration before deploying the updated application. No additional
+environment variables or hosted Auth changes are needed. Database regression
+tests compare normal-team rows before and after cleanup, and the local browser
+integration runner is `pnpm test:e2e:trial --project=chromium`.
+
 ## Organizer accounts and upgrades
 
 Only emails in `public.organizer_email_allowlist` can create an organizer account or receive a new access token through the passwordless sign-in form. The server checks the table before asking Supabase Auth to send a magic link, so unlisted addresses receive no email; the Auth Hooks independently enforce the same policy for account and token creation. Every allowlist entry has a server-managed team assignment. Organizers on the same team share polls, saved centers, winner history, and poll management access; organizers cannot select or change teams in the app. Voters still join with the referral link and do not need an account. `/admin` remains the organizer workspace URL.

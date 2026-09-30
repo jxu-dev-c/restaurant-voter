@@ -23,6 +23,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:accounts": "node scripts/test-organizer-e2e.mjs",
+    "test:e2e:trial": "node scripts/test-trial-e2e.mjs",
     "ux:screenshots": "bash scripts/capture-ux-screenshots.sh",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",

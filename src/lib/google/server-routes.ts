@@ -1,4 +1,5 @@
 import "server-only";
+import { getTrialSampleRoute } from "@/lib/trial/sample-restaurants";
 
 import { ROUTE_MATRIX_FIELD_MASK } from "./place-fields";
 import {
@@ -62,6 +63,19 @@ export async function computeRouteMatrix(
 
   if (destinationPlaceIds.length === 0) {
     return { ok: true, data: { routes: [] } };
+  }
+
+  const sampleRoutes = destinationPlaceIds.map((placeId, index) => getTrialSampleRoute(placeId, input.origin, index));
+  if (sampleRoutes.some(Boolean)) {
+    // Synthetic IDs never reach Google. Mixed shortlists retain live routing
+    // for real restaurants and the original destination order.
+    const liveIds = destinationPlaceIds.filter((_, index) => !sampleRoutes[index]);
+    const live = await computeRouteMatrix({ ...input, destinationPlaceIds: liveIds });
+    if (!live.ok) return live;
+    return { ok: true, data: { routes: destinationPlaceIds.flatMap((placeId, index) => {
+      const route = sampleRoutes[index] ?? live.data.routes.find((value) => value.placeId === placeId);
+      return route ? [{ ...route, destinationIndex: index }] : [];
+    }) } };
   }
 
   const apiKey =

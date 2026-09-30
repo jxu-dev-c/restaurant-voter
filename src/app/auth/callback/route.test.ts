@@ -2,11 +2,13 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 vi.mock("server-only", () => ({}));
-const { getUser, verifyOtp, signOut, exchangeCodeForSession } = vi.hoisted(() => ({
+const { getUser, verifyOtp, signOut, exchangeCodeForSession, clearTrialSession } = vi.hoisted(() => ({
   getUser: vi.fn(), verifyOtp: vi.fn(), signOut: vi.fn(), exchangeCodeForSession: vi.fn(),
+  clearTrialSession: vi.fn(),
 }));
 vi.mock("@/lib/env", () => ({ getPublicEnvironment: () => ({ appUrl: "https://lunch.example" }) }));
 vi.mock("@/lib/supabase/server", () => ({ createServerSupabaseClient: async () => ({ auth: { getUser, verifyOtp, signOut, exchangeCodeForSession } }) }));
+vi.mock("@/lib/trial/workspace", () => ({ clearTrialSession }));
 import { GET, POST } from "./route";
 
 function confirmRequest(parameters = "token_hash=test&type=email") {
@@ -32,6 +34,7 @@ it("keeps authenticated redirects on the configured origin", async () => {
   expect(response.status).toBe(303);
   expect(response.headers.get("location")).toBe("https://lunch.example/admin/polls/new");
   expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(clearTrialSession).toHaveBeenCalledOnce();
 });
 
 it("rejects unverified sessions and clears them", async () => {

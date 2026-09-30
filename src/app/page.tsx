@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { tryOrganizer, tryVoting } from "@/app/trial/actions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   ArrowRightIcon,
   StorefrontIcon,
@@ -48,6 +50,17 @@ export default function Home() {
             <h1 className="hero-title mt-5">
               Turn “where should we eat?” into a two-minute vote
             </h1>
+            <div id="try-it" className="mt-6 scroll-mt-16">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <form action={tryOrganizer}>
+                  <SubmitButton className="button w-full bg-surface text-blue hover:bg-band" pendingLabel="Opening trial…">Try as an organizer</SubmitButton>
+                </form>
+                <form action={tryVoting}>
+                  <SubmitButton className="button w-full border-on-blue/35 text-on-blue hover:bg-white/10" pendingLabel="Opening vote…">Try voting</SubmitButton>
+                </form>
+              </div>
+              <p className="mt-3 text-sm text-on-blue/75">No signup · Shared sample data · Resets weekly</p>
+            </div>
             <p className="mt-6 max-w-md text-base leading-7 text-on-blue/85">
               Put nearby restaurants on one map, compare the drive, collect a few
               choices from everyone, and keep yesterday&apos;s winners in view.
@@ -140,6 +153,20 @@ export default function Home() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="shell py-12 sm:py-16">
+        <p className="eyebrow">Take LunchPick for a spin</p>
+        <h2 className="section-title mt-4">Try a team lunch with sample data</h2>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-muted">
+          Explore a shared trial team with sample restaurants, votes, and past winners.
+          Organize a poll and share its link, or join a vote to see the voter experience.
+          No email or account setup required.
+        </p>
+        <p className="mt-4 max-w-2xl text-xs leading-6 text-muted">
+          Trial data is shared with other visitors and resets every Monday at 00:00 UTC.
+          Use sample information. Your normal team’s data stays separate.
+        </p>
       </section>
 
       {/* Full-bleed blue CTA band, straight from the reference's newsletter strip. */}

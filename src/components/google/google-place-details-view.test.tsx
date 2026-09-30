@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import type { GooglePlaceDetails } from "@/lib/google/types";
+import { getTrialSamplePlace } from "@/lib/trial/sample-restaurants";
 
 import { GooglePlaceDetailsView } from "./google-place-details-view";
 
@@ -20,6 +21,13 @@ const place: GooglePlaceDetails = {
 };
 
 describe("GooglePlaceDetailsView", () => {
+  it("identifies fictional profiles without linking to Google reviews", () => {
+    render(<GooglePlaceDetailsView variant="flat" place={getTrialSamplePlace("lunchpick-trial-sample-1")!} />);
+    expect(screen.getByRole("heading", { name: "Harbour Tacos" })).toBeInTheDocument();
+    expect(screen.getByText("Fictional sample restaurant")).toBeInTheDocument();
+    expect(screen.getByText("4.7 (128)")).toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
   it.each(["card", "flat", "admin-row"] as const)("shows poll-day hours instead of operational status in %s", (variant) => {
     render(<GooglePlaceDetailsView variant={variant} place={{
       ...place,

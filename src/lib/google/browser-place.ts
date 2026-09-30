@@ -4,6 +4,7 @@ import { loadGoogleMapsLibrary } from "./browser-loader";
 import { BROWSER_PLACE_FIELDS } from "./place-fields";
 import { mapBrowserPlace } from "./place-mapper";
 import type { GoogleApiResult, GooglePlaceDetails } from "./types";
+import { getTrialSamplePlace } from "@/lib/trial/sample-restaurants";
 
 type PlaceDetailsOptions = {
   apiKey?: string;
@@ -32,6 +33,8 @@ async function fetchBrowserPlaceDetails(
   options: PlaceDetailsOptions,
 ): Promise<GoogleApiResult<GooglePlaceDetails>> {
   const normalizedPlaceId = placeId.trim();
+  const sample = getTrialSamplePlace(normalizedPlaceId);
+  if (sample) return { ok: true, data: sample };
   if (!normalizedPlaceId) {
     return {
       ok: false,

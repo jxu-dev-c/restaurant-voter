@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireOwnedPoll } from "@/lib/data/ownership";
-import { assertAdmin } from "@/lib/auth/admin";
+import { requireOrganizer, requireOwnedPoll } from "@/lib/data/ownership";
 import {
   addManualWinner,
   closePoll,
@@ -30,28 +29,28 @@ import { pollStatuses } from "@/lib/domain/types";
 import { validateRestaurantPlace } from "@/lib/google/server-place";
 
 export async function createCenterAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const input = centerSchema.parse(formDataObject(formData));
   await createLunchCenter(input);
   revalidatePath("/admin/centers");
 }
 
 export async function createPollAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const input = createPollSchema.parse(formDataObject(formData));
   const poll = await createPoll(input);
   redirect(`/admin/polls/${poll.id}`);
 }
 
 export async function duplicatePollAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   const copyId = await duplicatePoll({ pollId });
   redirect(`/admin/polls/${copyId}`);
 }
 
 export async function transitionPollAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   const targetStatus = String(formData.get("targetStatus") ?? "");
   if (!pollStatuses.includes(targetStatus as (typeof pollStatuses)[number])) {
@@ -65,7 +64,7 @@ export async function transitionPollAction(formData: FormData) {
 }
 
 export async function updatePollLimitsAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const input = updatePollLimitsSchema.parse(formDataObject(formData));
   const poll = await updatePollLimits(input);
   revalidatePath(`/admin/polls/${input.pollId}`);
@@ -74,14 +73,14 @@ export async function updatePollLimitsAction(formData: FormData) {
 }
 
 export async function closePollAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   await closePoll({ pollId });
   revalidatePath(`/admin/polls/${pollId}`);
 }
 
 export async function resolveTieAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   const candidateId = String(formData.get("candidateId") ?? "");
   await resolvePollTie({ pollId, candidateId });
@@ -90,14 +89,14 @@ export async function resolveTieAction(formData: FormData) {
 }
 
 export async function rotatePollAccessAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   await rotatePollAccess({ pollId });
   revalidatePath(`/admin/polls/${pollId}`);
 }
 
 export async function deletePollVoterAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   const voterId = String(formData.get("voterId") ?? "");
   if (!pollId || !voterId) throw new Error("A poll and voter are required");
@@ -110,7 +109,7 @@ export async function deletePollVoterAction(formData: FormData) {
 }
 
 export async function addAdminCandidateAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   await requireOwnedPoll(pollId);
   const parsed = placeSelectionSchema.parse({
@@ -129,7 +128,7 @@ export async function addAdminCandidateAction(formData: FormData) {
 }
 
 export async function toggleCandidateAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const pollId = String(formData.get("pollId") ?? "");
   const candidateId = String(formData.get("candidateId") ?? "");
   const active = formData.get("active") === "true";
@@ -142,7 +141,7 @@ export async function toggleCandidateAction(formData: FormData) {
 }
 
 export async function addManualWinnerAction(formData: FormData) {
-  await assertAdmin();
+  await requireOrganizer();
   const parsed = winnerSchema.parse({
     placeId: formData.get("placeId"),
     fallbackLabel: formData.get("fallbackLabel"),

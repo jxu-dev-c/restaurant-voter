@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-const { assertAdmin, createServiceRoleClient } = vi.hoisted(() => ({
+const { assertAdmin, createServiceRoleClient, getTrialOrganizer } = vi.hoisted(() => ({
   assertAdmin: vi.fn(),
   createServiceRoleClient: vi.fn(),
+  getTrialOrganizer: vi.fn(),
 }));
 vi.mock("@/lib/auth/admin", () => ({ assertAdmin, requireAdmin: assertAdmin }));
 vi.mock("@/lib/supabase/service-role", () => ({ createServiceRoleClient }));
+vi.mock("@/lib/trial/workspace", () => ({ getTrialOrganizer, TrialSessionExpiredError: class extends Error {} }));
 
 import { requireOwnedPoll } from "./ownership";
+import { TrialSessionExpiredError } from "@/lib/trial/workspace";
 import * as mutations from "./mutations";
 import { getAdminPollDetail, listAdminPolls, listLunchCenters, listWinnerHistory } from "./polls";
 
@@ -44,6 +47,7 @@ const from = vi.fn((table: string) => {
 beforeEach(() => {
   vi.clearAllMocks();
   assertAdmin.mockResolvedValue(user);
+  getTrialOrganizer.mockResolvedValue(null);
   createServiceRoleClient.mockReturnValue({ from, rpc });
 });
 
@@ -63,6 +67,27 @@ describe("organizer team access", () => {
     from.mockClear();
     await expect(getAdminPollDetail("poll-b")).resolves.toBeNull();
     expect(from).toHaveBeenCalledTimes(2); // Allowlist and poll only; no private poll details are loaded.
+  });
+
+  it("keeps a trial organizer out of normal team data even with a real session", async () => {
+    getTrialOrganizer.mockResolvedValue({ id: null, email: "trial@lunchpick.invalid", teamId: "trial-team", teamName: "Trial", teamSlug: "trial" });
+    await expect(listAdminPolls()).resolves.toEqual([]);
+    await expect(listLunchCenters()).resolves.toEqual([]);
+    await expect(listWinnerHistory()).resolves.toEqual([]);
+    await expect(getAdminPollDetail("poll-b")).resolves.toBeNull();
+    await expect(mutations.rotatePollAccess({ pollId: "poll-b" })).rejects.toThrow("Poll not found or access denied");
+    await expect(mutations.createPoll({ title: "Trial", lunchCenterId: "center-b", voteLimit: 1, nominationLimit: 3, nominationsEnabled: true })).rejects.toThrow("Unable to load lunch center");
+    expect(assertAdmin).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("never falls back to a real organizer for an expired trial mutation", async () => {
+    getTrialOrganizer.mockRejectedValue(new TrialSessionExpiredError());
+    await expect(mutations.createLunchCenter({ name: "Stale trial form", latitude: 44, longitude: -63 })).rejects.toBeInstanceOf(TrialSessionExpiredError);
+    expect(assertAdmin).not.toHaveBeenCalled();
+    expect(from).not.toHaveBeenCalled();
+    expect(insert).not.toHaveBeenCalled();
   });
 
   it("authorizes a teammate even when another organizer created the poll", async () => {
