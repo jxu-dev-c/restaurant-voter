@@ -30,6 +30,7 @@ const records: Record<string, Record<string, unknown>[]> = {
 };
 const rpc = vi.fn();
 const insert = vi.fn();
+const update = vi.fn();
 const from = vi.fn((table: string) => {
   let rows = records[table] ?? [];
   const query = {
@@ -37,6 +38,7 @@ const from = vi.fn((table: string) => {
     eq: vi.fn((key: string, value: unknown) => { rows = rows.filter((row) => row[key] === value); return query; }),
     order: vi.fn(() => query),
     insert,
+    update: vi.fn((values: unknown) => { update(values); return query; }),
     maybeSingle: vi.fn(async () => ({ data: rows[0] ?? null, error: null })),
     single: vi.fn(async () => ({ data: rows[0] ?? null, error: rows.length ? null : { message: "No rows" } })),
     then: (resolve: (value: unknown) => unknown) => Promise.resolve({ data: rows, error: null }).then(resolve),
@@ -126,6 +128,19 @@ describe("organizer team access", () => {
     await expect(run()).rejects.toThrow("Poll not found or access denied");
     expect(rpc).not.toHaveBeenCalled();
     expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("cannot hide another team's winner", async () => {
+    await expect(mutations.setWinnerHidden({ winnerId: "winner-b", hidden: true })).rejects.toThrow("Winner not found or access denied");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("hides and shows a winner in the organizer's own team", async () => {
+    assertAdmin.mockResolvedValue({ id: "organizer-b", email: "b@example.com" });
+    await expect(mutations.setWinnerHidden({ winnerId: "winner-b", hidden: true })).resolves.toBeUndefined();
+    expect(update).toHaveBeenLastCalledWith({ hidden_at: expect.any(String) });
+    await expect(mutations.setWinnerHidden({ winnerId: "winner-b", hidden: false })).resolves.toBeUndefined();
+    expect(update).toHaveBeenLastCalledWith({ hidden_at: null });
   });
 
   it("cannot create a poll using another team's center", async () => {

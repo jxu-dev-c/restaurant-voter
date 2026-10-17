@@ -99,6 +99,7 @@ export type WinnerHistoryView = {
   sourcePollId: string | null;
   wonOn: string;
   notes: string | null;
+  hidden: boolean;
 };
 
 export type ActionState = {

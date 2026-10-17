@@ -15,6 +15,7 @@ import {
   rotatePollAccess,
   seedPollCandidate,
   setPollCandidateActive,
+  setWinnerHidden,
   transitionPoll,
   updatePollLimits,
 } from "@/lib/data/mutations";
@@ -165,5 +166,13 @@ export async function addManualWinnerAction(formData: FormData) {
     wonOn: parsed.wonOn,
     notes: parsed.notes,
   });
+  revalidatePath("/admin/winners");
+}
+
+export async function setWinnerHiddenAction(formData: FormData) {
+  await requireOrganizer();
+  const winnerId = String(formData.get("winnerId") ?? "");
+  const hidden = formData.get("hidden") === "true";
+  await setWinnerHidden({ winnerId, hidden });
   revalidatePath("/admin/winners");
 }

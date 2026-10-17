@@ -32,7 +32,6 @@ function renderControls(poll: AdminPollDetail) {
   return render(
     <PhaseControls
       closeAction={vi.fn()}
-      closeEarlyAction={vi.fn()}
       poll={poll}
       resolveTieAction={vi.fn()}
       transitionAction={vi.fn()}
@@ -41,17 +40,16 @@ function renderControls(poll: AdminPollDetail) {
 }
 
 describe("PhaseControls", () => {
-  it.each(["draft", "nominations"] as const)("offers an early close while %s", (status) => {
+  it.each(["draft", "nominations"] as const)("leaves the early close to the settings tab while %s", (status) => {
     renderControls(makePoll({ status }));
 
-    expect(screen.getByRole("button", { name: "Close poll early" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Close poll early" })).not.toBeInTheDocument();
   });
 
-  it("keeps the publishing close during voting instead of the early close", () => {
+  it("offers the publishing close during voting", () => {
     renderControls(makePoll({ status: "voting" }));
 
     expect(screen.getByRole("button", { name: "Close voting and publish" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Close poll early" })).not.toBeInTheDocument();
   });
 
   it("explains a poll that was closed early", () => {
