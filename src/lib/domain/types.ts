@@ -1,7 +1,7 @@
 export const pollStatuses = ["draft", "nominations", "voting", "closed"] as const;
 export type PollStatus = (typeof pollStatuses)[number];
 
-export const outcomeStatuses = ["pending", "no_votes", "unique_winner", "tie", "resolved_tie"] as const;
+export const outcomeStatuses = ["pending", "no_votes", "unique_winner", "tie", "resolved_tie", "cancelled"] as const;
 export type OutcomeStatus = (typeof outcomeStatuses)[number];
 
 export type LunchCenter = {

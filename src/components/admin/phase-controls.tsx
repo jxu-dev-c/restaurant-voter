@@ -9,10 +9,17 @@ type PhaseControlsProps = {
   poll: AdminPollDetail;
   transitionAction: (formData: FormData) => Promise<void>;
   closeAction: (formData: FormData) => Promise<void>;
+  closeEarlyAction: (formData: FormData) => Promise<void>;
   resolveTieAction: (formData: FormData) => Promise<void>;
 };
 
-export function PhaseControls({ poll, transitionAction, closeAction, resolveTieAction }: PhaseControlsProps) {
+export function PhaseControls({
+  poll,
+  transitionAction,
+  closeAction,
+  closeEarlyAction,
+  resolveTieAction,
+}: PhaseControlsProps) {
   const readiness = derivePollReadiness(poll);
   const activeCandidates = poll.candidates.filter((candidate) => candidate.status === "active");
   const tiedLeaders = poll.outcomeStatus === "tie"
@@ -22,12 +29,13 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
     ? ["draft", "nominations", "voting", "closed"]
     : ["draft", "voting", "closed"];
   const currentPhaseIndex = phases.indexOf(poll.status);
+  const closedEarly = poll.status === "closed" && poll.outcomeStatus === "cancelled";
 
   return (
     <section className="admin-lifecycle-panel">
       <div className="layout-rail gap-8">
         <div>
-          <h2 className="title-content text-2xl">{poll.status === "closed" ? "Poll complete" : "Move the poll forward"}</h2>
+          <h2 className="title-content text-2xl">{closedEarly ? "Poll closed early" : poll.status === "closed" ? "Poll complete" : "Move the poll forward"}</h2>
           <ol className="mt-6 grid gap-2 sm:grid-flow-col sm:auto-cols-fr" aria-label="Poll phases">
             {phases.map((phase, index) => {
               const state = index < currentPhaseIndex ? "complete" : index === currentPhaseIndex ? "current" : "upcoming";
@@ -85,6 +93,24 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
                   <ArrowRightIcon size={15} />
                 </SubmitButton>
               </ConfirmActionForm>
+              <div className="mt-5 border-t border-line pt-4">
+                <p className="text-sm leading-6 text-muted">
+                  Made by mistake or no longer needed? Close it now without a winner.
+                </p>
+                <ConfirmActionForm
+                  action={closeEarlyAction}
+                  className="mt-3"
+                  confirmLabel="Close poll"
+                  confirmMessage="Close this poll now? No winner is recorded and it cannot reopen. You can still duplicate it as a new draft."
+                  confirmTitle="Close this poll early?"
+                  tone="danger"
+                >
+                  <input type="hidden" name="pollId" value={poll.id} />
+                  <SubmitButton className="button button-ghost w-full text-danger" pendingLabel="Closing poll…">
+                    Close poll early
+                  </SubmitButton>
+                </ConfirmActionForm>
+              </div>
             </>
           ) : poll.status === "voting" ? (
             <>
@@ -104,6 +130,14 @@ export function PhaseControls({ poll, transitionAction, closeAction, resolveTieA
                   Close voting and publish
                 </SubmitButton>
               </ConfirmActionForm>
+            </>
+          ) : closedEarly ? (
+            <>
+              <p className="admin-data-label">Lifecycle status</p>
+              <h3 className="mt-1 card-title text-xl">Closed before voting</h3>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                No winner was recorded and the poll is now read-only. Duplicate it to start over.
+              </p>
             </>
           ) : (
             <>

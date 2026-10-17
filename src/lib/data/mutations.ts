@@ -179,6 +179,16 @@ export async function closePoll(input: { pollId: string }) {
   return data;
 }
 
+export async function closePollEarly(input: { pollId: string }) {
+  const organizer = await requireOwnedPoll(input.pollId);
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.rpc("close_poll_early", {
+    p_poll_id: input.pollId,
+    p_admin_email: organizer.email,
+  });
+  assertNoError(error, "Unable to close poll early");
+}
+
 export async function resolvePollTie(input: {
   pollId: string;
   candidateId: string;
