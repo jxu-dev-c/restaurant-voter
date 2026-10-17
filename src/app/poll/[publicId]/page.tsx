@@ -81,7 +81,9 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
                   {poll.status === "closed" ? (
                     <>
                       <DateIcon className="shrink-0" size={16} />
-                      {`Voting closed ${formatDate(poll.closedAt)}.`}
+                      {poll.outcomeStatus === "cancelled"
+                        ? `Closed early ${formatDate(poll.closedAt)}.`
+                        : `Voting closed ${formatDate(poll.closedAt)}.`}
                     </>
                   ) : (
                     <>
@@ -165,9 +167,13 @@ export default async function PollPage({ params }: { params: Promise<{ publicId:
             {poll.outcomeStatus === "tie" ? (
               <Notice title="The leaders are tied" tone="warning">The organizer is choosing one official winner from the tied restaurants.</Notice>
             ) : null}
-            <div className={poll.winnerCandidateId ? "" : "mt-5"}>
-              <ResultsList candidates={activeCandidates} winnerCandidateId={poll.winnerCandidateId} />
-            </div>
+            {poll.outcomeStatus === "cancelled" ? (
+              <Notice title="Poll closed early" tone="warning">The organizer closed this poll before voting, so there is no winner.</Notice>
+            ) : (
+              <div className={poll.winnerCandidateId ? "" : "mt-5"}>
+                <ResultsList candidates={activeCandidates} winnerCandidateId={poll.winnerCandidateId} />
+              </div>
+            )}
           </section>
         ) : null}
       </main>

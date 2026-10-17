@@ -12,6 +12,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import {
   addAdminCandidateAction,
   closePollAction,
+  closePollEarlyAction,
   deletePollVoterAction,
   duplicatePollAction,
   resolveTieAction,
@@ -82,6 +83,7 @@ export default async function AdminPollPage({
       {/* Lifecycle stays pinned above the tabs — it is the point of the page. */}
       <PhaseControls
         closeAction={closePollAction}
+        closeEarlyAction={closePollEarlyAction}
         poll={poll}
         resolveTieAction={resolveTieAction}
         transitionAction={transitionPollAction}

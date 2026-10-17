@@ -73,6 +73,30 @@ test("trial organizers create and share polls; voters save and edit ballots", as
   await expect(page).toHaveURL(/\/auth\/login/);
 });
 
+test("trial organizers can close a draft poll early", async ({ page }) => {
+  test.setTimeout(60_000);
+  test.skip(!localUrl || !localKey, "Requires local Supabase integration credentials");
+  expect(new URL(localUrl!).hostname).toMatch(/^(127\.0\.0\.1|localhost)$/);
+  const db = createClient(localUrl!, localKey!, { auth: { persistSession: false } });
+  const title = `Trial early close ${randomUUID()}`;
+  await page.goto("/");
+  await page.getByRole("button", { name: "Try as an organizer" }).click();
+  await expect(page.getByRole("heading", { name: "Lunch polls", exact: true })).toBeVisible();
+  await page.goto("/admin/polls/new");
+  await page.getByLabel("Poll title").fill(title);
+  await page.getByLabel("Lunch center").selectOption({ index: 1 });
+  await page.getByRole("button", { name: "Create draft poll" }).click();
+  await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
+  const pollId = new URL(page.url()).pathname.split("/").pop()!;
+  await page.getByRole("button", { name: "Close poll early" }).click();
+  await page.getByRole("button", { name: "Close poll", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Poll closed early" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close poll early" })).toHaveCount(0);
+  const { data: closed } = await db.from("polls").select("status,outcome_status,closed_at").eq("id", pollId).single();
+  expect(closed).toMatchObject({ status: "closed", outcome_status: "cancelled" });
+  expect(closed!.closed_at).not.toBeNull();
+});
+
 test("trial mode preserves a normal sign-in and blocks access after trial expiry", async ({ page, context, baseURL }) => {
   test.setTimeout(90_000);
   test.skip(!localUrl || !localKey, "Requires local Supabase integration credentials");

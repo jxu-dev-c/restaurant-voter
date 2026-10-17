@@ -6,6 +6,7 @@ import { requireOrganizer, requireOwnedPoll } from "@/lib/data/ownership";
 import {
   addManualWinner,
   closePoll,
+  closePollEarly,
   createLunchCenter,
   createPoll,
   duplicatePoll,
@@ -77,6 +78,14 @@ export async function closePollAction(formData: FormData) {
   const pollId = String(formData.get("pollId") ?? "");
   await closePoll({ pollId });
   revalidatePath(`/admin/polls/${pollId}`);
+}
+
+export async function closePollEarlyAction(formData: FormData) {
+  await requireOrganizer();
+  const pollId = String(formData.get("pollId") ?? "");
+  await closePollEarly({ pollId });
+  revalidatePath(`/admin/polls/${pollId}`);
+  revalidatePath("/admin");
 }
 
 export async function resolveTieAction(formData: FormData) {
