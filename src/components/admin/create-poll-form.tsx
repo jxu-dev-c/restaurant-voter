@@ -1,5 +1,11 @@
 import type { LunchCenter } from "@/lib/domain/types";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { SuccessIcon } from "@/components/ui/icons";
+
+// A focused preset for a typical team lunch: two picks keep the vote decisive
+// and three nominations each keep the shortlist scannable.
+export const OPTIMAL_VOTE_LIMIT = 2;
+export const OPTIMAL_NOMINATION_LIMIT = 3;
 
 type CreatePollFormProps = {
   centers: LunchCenter[];
@@ -37,14 +43,18 @@ export function CreatePollForm({ centers, action }: CreatePollFormProps) {
         </div>
         <div>
           <label className="field-label" htmlFor="voteLimit">Choices per voter</label>
-          <input className="field" id="voteLimit" name="voteLimit" type="number" min={1} max={10} defaultValue={3} required />
+          <input className="field" id="voteLimit" name="voteLimit" type="number" min={1} max={10} defaultValue={OPTIMAL_VOTE_LIMIT} required />
           <p className="mt-2 text-sm text-muted">The final shortlist must contain at least this many restaurants.</p>
         </div>
         <div>
           <label className="field-label" htmlFor="nominationLimit">Nominations per voter</label>
-          <input className="field" id="nominationLimit" name="nominationLimit" type="number" min={1} max={50} defaultValue={5} required />
+          <input className="field" id="nominationLimit" name="nominationLimit" type="number" min={1} max={50} defaultValue={OPTIMAL_NOMINATION_LIMIT} required />
           <p className="mt-2 text-sm text-muted">Used only when voter nominations are enabled.</p>
         </div>
+        <p className="flex items-start gap-2 text-sm font-semibold text-leaf sm:col-span-2">
+          <SuccessIcon className="mt-0.5 shrink-0" size={16} />
+          <span>These defaults are already the optimal setting for your team size.</span>
+        </p>
       </section>
 
       <section className="grid gap-5 border-t border-line p-5 sm:p-7">
