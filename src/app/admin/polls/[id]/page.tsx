@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCandidateForm } from "@/components/admin/admin-candidate-form";
 import { CandidateRoster } from "@/components/admin/candidate-roster";
+import { ClosePollEarlyForm } from "@/components/admin/close-poll-early-form";
 import { ParticipationList } from "@/components/admin/participation-list";
 import { PhaseControls } from "@/components/admin/phase-controls";
 import { PollLimitForm } from "@/components/admin/poll-limit-form";
@@ -83,7 +84,6 @@ export default async function AdminPollPage({
       {/* Lifecycle stays pinned above the tabs — it is the point of the page. */}
       <PhaseControls
         closeAction={closePollAction}
-        closeEarlyAction={closePollEarlyAction}
         poll={poll}
         resolveTieAction={resolveTieAction}
         transitionAction={transitionPollAction}
@@ -180,6 +180,9 @@ export default async function AdminPollPage({
                 </SubmitButton>
               </form>
             </div>
+            {canEditCandidates ? (
+              <ClosePollEarlyForm action={closePollEarlyAction} pollId={poll.id} />
+            ) : null}
           </section>
         </div>
       ) : null}

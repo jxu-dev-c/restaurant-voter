@@ -9,7 +9,6 @@ type PhaseControlsProps = {
   poll: AdminPollDetail;
   transitionAction: (formData: FormData) => Promise<void>;
   closeAction: (formData: FormData) => Promise<void>;
-  closeEarlyAction: (formData: FormData) => Promise<void>;
   resolveTieAction: (formData: FormData) => Promise<void>;
 };
 
@@ -17,7 +16,6 @@ export function PhaseControls({
   poll,
   transitionAction,
   closeAction,
-  closeEarlyAction,
   resolveTieAction,
 }: PhaseControlsProps) {
   const readiness = derivePollReadiness(poll);
@@ -93,24 +91,6 @@ export function PhaseControls({
                   <ArrowRightIcon size={15} />
                 </SubmitButton>
               </ConfirmActionForm>
-              <div className="mt-5 border-t border-line pt-4">
-                <p className="text-sm leading-6 text-muted">
-                  Made by mistake or no longer needed? Close it now without a winner.
-                </p>
-                <ConfirmActionForm
-                  action={closeEarlyAction}
-                  className="mt-3"
-                  confirmLabel="Close poll"
-                  confirmMessage="Close this poll now? No winner is recorded and it cannot reopen. You can still duplicate it as a new draft."
-                  confirmTitle="Close this poll early?"
-                  tone="danger"
-                >
-                  <input type="hidden" name="pollId" value={poll.id} />
-                  <SubmitButton className="button button-ghost w-full text-danger" pendingLabel="Closing poll…">
-                    Close poll early
-                  </SubmitButton>
-                </ConfirmActionForm>
-              </div>
             </>
           ) : poll.status === "voting" ? (
             <>

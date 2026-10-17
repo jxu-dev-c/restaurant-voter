@@ -88,6 +88,7 @@ test("trial organizers can close a draft poll early", async ({ page }) => {
   await page.getByRole("button", { name: "Create draft poll" }).click();
   await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
   const pollId = new URL(page.url()).pathname.split("/").pop()!;
+  await page.getByRole("link", { name: "Share & settings" }).click();
   await page.getByRole("button", { name: "Close poll early" }).click();
   await page.getByRole("button", { name: "Close poll", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Poll closed early" })).toBeVisible();
