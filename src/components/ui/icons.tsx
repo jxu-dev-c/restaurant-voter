@@ -32,6 +32,8 @@ import { CheckSquareIcon as PhCheckSquare } from "@phosphor-icons/react/dist/ssr
 import { ClockIcon as PhClock } from "@phosphor-icons/react/dist/ssr/Clock";
 import { CopyIcon as PhCopy } from "@phosphor-icons/react/dist/ssr/Copy";
 import { EnvelopeSimpleIcon as PhEnvelopeSimple } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
+import { EyeIcon as PhEye } from "@phosphor-icons/react/dist/ssr/Eye";
+import { EyeSlashIcon as PhEyeSlash } from "@phosphor-icons/react/dist/ssr/EyeSlash";
 import { ForkKnifeIcon as PhForkKnife } from "@phosphor-icons/react/dist/ssr/ForkKnife";
 import { HandPointingIcon as PhHandPointing } from "@phosphor-icons/react/dist/ssr/HandPointing";
 import { InfoIcon as PhInfo } from "@phosphor-icons/react/dist/ssr/Info";
@@ -123,4 +125,6 @@ export const SearchIcon = decorative(PhMagnifyingGlass, "SearchIcon");
 export const CloseIcon = decorative(PhX, "CloseIcon", { weight: "bold" });
 export const ArrowRightIcon = decorative(PhArrowRight, "ArrowRightIcon");
 export const ExternalLinkIcon = decorative(PhArrowUpRight, "ExternalLinkIcon");
+export const HideIcon = decorative(PhEyeSlash, "HideIcon");
+export const ShowIcon = decorative(PhEye, "ShowIcon");
 export const CaretRightIcon = decorative(PhCaretRight, "CaretRightIcon", { weight: "bold" });

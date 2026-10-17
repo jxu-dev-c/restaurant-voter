@@ -358,3 +358,16 @@ export async function addManualWinner(input: {
   });
   assertNoError(error, "Unable to add winner history");
 }
+
+export async function setWinnerHidden(input: { winnerId: string; hidden: boolean }) {
+  const organizer = await requireOrganizer();
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase
+    .from("winner_history")
+    .update({ hidden_at: input.hidden ? new Date().toISOString() : null })
+    .eq("id", input.winnerId)
+    .eq("team_id", organizer.teamId)
+    .select("id");
+  assertNoError(error, "Unable to update winner history");
+  if (!data?.length) throw new Error("Winner not found or access denied");
+}

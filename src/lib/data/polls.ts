@@ -113,6 +113,7 @@ async function loadCandidateViews(
           .select("restaurant_id,won_on")
           .in("restaurant_id", restaurantIds)
           .eq("team_id", options.teamId)
+          .is("hidden_at", null)
           .order("won_on", { ascending: false })
       : Promise.resolve({ data: [], error: null }),
     options.includeResults
@@ -431,7 +432,7 @@ export async function listWinnerHistory(): Promise<WinnerHistoryView[]> {
   const supabase = createServiceRoleClient();
   const { data, error } = await supabase
     .from("winner_history")
-    .select("id,restaurant_id,fallback_label,source_poll_id,source,won_on,notes,restaurants!inner(id,google_place_id)")
+    .select("id,restaurant_id,fallback_label,source_poll_id,source,won_on,notes,hidden_at,restaurants!inner(id,google_place_id)")
     .eq("team_id", organizer.teamId)
     .order("won_on", { ascending: false });
   if (error) throw new Error(`Unable to load winner history: ${error.message}`);
@@ -447,6 +448,7 @@ export async function listWinnerHistory(): Promise<WinnerHistoryView[]> {
       sourcePollId: row.source_poll_id,
       wonOn: row.won_on,
       notes: row.notes,
+      hidden: row.hidden_at !== null,
     };
   });
 }
